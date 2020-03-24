@@ -1,9 +1,7 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/IM_server.dir/src/server.cpp.obj"
-  "IM_server.exe"
-  "IM_server.exe.manifest"
+  "CMakeFiles/IM_server.dir/src/server.cpp.o"
   "IM_server.pdb"
-  "libIM_server.dll.a"
+  "IM_server"
 )
 
 # Per-language clean rules from dependency scanning.

@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-C:/Users/Mingor/Desktop/IM_server/include/utility.h
+/mnt/c/Users/Mingor/Desktop/IM_server/include/utility.h
 iostream
 -
 list
@@ -34,7 +34,7 @@ stdlib.h
 string.h
 -
 
-C:/Users/Mingor/Desktop/IM_server/src/server.cpp
+/mnt/c/Users/Mingor/Desktop/IM_server/src/server.cpp
 ../include/utility.h
-C:/Users/Mingor/Desktop/IM_server/include/utility.h
+/mnt/c/Users/Mingor/Desktop/IM_server/include/utility.h
 

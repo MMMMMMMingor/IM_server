@@ -5,3 +5,4 @@ project(IM_server)
 include_directories(./include)
 
 add_executable(${PROJECT_NAME} ./src/server.cpp)
+add_executable("client" ./src/client.cpp)

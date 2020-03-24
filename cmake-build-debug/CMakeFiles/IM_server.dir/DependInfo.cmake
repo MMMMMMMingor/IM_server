@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "C:/Users/Mingor/Desktop/IM_server/src/server.cpp" "C:/Users/Mingor/Desktop/IM_server/cmake-build-debug/CMakeFiles/IM_server.dir/src/server.cpp.obj"
+  "/mnt/c/Users/Mingor/Desktop/IM_server/src/server.cpp" "/mnt/c/Users/Mingor/Desktop/IM_server/cmake-build-debug/CMakeFiles/IM_server.dir/src/server.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
