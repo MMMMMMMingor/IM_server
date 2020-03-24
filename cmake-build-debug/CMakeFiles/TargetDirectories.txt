@@ -1,4 +1,0 @@
-/mnt/c/Users/Mingor/Desktop/IM_server/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/mnt/c/Users/Mingor/Desktop/IM_server/cmake-build-debug/CMakeFiles/edit_cache.dir
-/mnt/c/Users/Mingor/Desktop/IM_server/cmake-build-debug/CMakeFiles/IM_server.dir
-/mnt/c/Users/Mingor/Desktop/IM_server/cmake-build-debug/CMakeFiles/client.dir
