@@ -1,5 +1,5 @@
-#ifndef CHAT_UTILITY_H
-#define CHAT_UTILITY_H
+#ifndef UTILITY_H
+#define UTILITY_H
 
 #include <iostream>
 #include <list>
@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 using namespace std;
 
 //clients_list save all the clients's socket
@@ -45,10 +46,17 @@ list<int> clients_list;
 /**
  *设置非阻塞
  */
-int setnonblockint(int sockfd) {
+int setNonblock(int sockfd) {
     fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFD, 0) | O_NONBLOCK);
     return 0;
 }
+
+// 输出错误
+void error(const char* msg) {
+    perror(msg);
+    exit(EXIT_FAILURE);
+}
+
 
 /**
  * 将文件描述符 fd 添加到 epollfd 标示的内核事件表中,
@@ -60,50 +68,15 @@ int setnonblockint(int sockfd) {
  * @param enable_et:enable_et = true,
  * 是否采用epoll的ET(边缘触发)工作方式；否则采用LT(水平触发)工作方式
  */
-void addfd(int epollfd, int fd, bool enable_et) {
-    struct epoll_event ev;
+void add_fd(int epollfd, int fd, bool enable_et) {
+    struct epoll_event ev{};
     ev.data.fd = fd;
     ev.events = EPOLLIN;
     if (enable_et) {
         ev.events = EPOLLIN | EPOLLET;
     }
     epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &ev);
-    setnonblockint(fd);
-    printf("fd added to epoll!\n\n");
+    setNonblock(fd);
 }
 
-//发送广播
-int sendBroadcastmessage(int clientfd) {
-    char buf[BUF_SIZE];
-    char message[BUF_SIZE];
-    bzero(buf, BUF_SIZE);
-    bzero(buf, BUF_SIZE);
-
-    printf("read from client(clientID = %d)\n", clientfd);
-    int len = recv(clientfd, buf, BUF_SIZE, 0);
-
-    if (0 == len) {
-        close(clientfd);
-        clients_list.remove(clientfd);
-        printf("ClientID = %d closed.\n now there are %d client in the char room\n",
-        clientfd, (int)clients_list.size());
-    } else {
-        if (1 == clients_list.size()) {
-            send(clientfd, CAUTION, strlen(CAUTION), 0);
-            return 0;
-        }
-        sprintf(message, SERVER_MESSAGE, clientfd, buf);
-        list<int>::iterator it;
-        for (it = clients_list.begin(); it != clients_list.end(); ++it) {
-            if (*it != clientfd) {
-                if (send(*it, message, BUF_SIZE, 0) < 0) {
-                    perror("error");
-                    exit(-1);
-                }
-            }
-        }
-    }
-    return len;
-}
-
-#endif //CHAT_UTILITY_H
+#endif //UTILITY_H

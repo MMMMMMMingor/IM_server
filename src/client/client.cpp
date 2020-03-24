@@ -1,7 +1,4 @@
-#include "../include/utility.h"
-
-#define error(msg) \
-    do {perror(msg); exit(EXIT_FAILURE); } while (0)
+#include "utility.hpp"
 
 int main(int argc, char *argv[]) {
     /**
@@ -16,17 +13,17 @@ int main(int argc, char *argv[]) {
      * 1:创建套接字socket
      * param1:指定地址族为IPv4;param2:指定传输协议为流式套接字;param3:指定传输协议为TCP,可设为0,由系统推导
      */
-    int clientfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (clientfd < 0) { error("socket error"); }
+    int client_fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (client_fd < 0) { error("socket error"); }
 
     // 填充sockadd结构,指定ip与端口
-    struct sockaddr_in serverAddr;
+    struct sockaddr_in serverAddr{};
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(SERVER_PORT);
     serverAddr.sin_addr.s_addr = inet_addr(SERVER_IP);
 
     // 2:连接服务端
-    if (connect(clientfd, (struct sockaddr *) &serverAddr, sizeof(serverAddr)) < 0) {
+    if (connect(client_fd, (struct sockaddr *) &serverAddr, sizeof(serverAddr)) < 0) {
         error("connect error");
     }
 
@@ -47,8 +44,8 @@ int main(int argc, char *argv[]) {
 
     static struct epoll_event events[2];
     //将sock和管道读端描述符都添加到内核事件表中
-    addfd(epfd, clientfd, true);
-    addfd(epfd, pipefd[0], true);
+    add_fd(epfd, client_fd, true);
+    add_fd(epfd, pipefd[0], true);
 
     // 表示客户端是否正常工作
     bool isClientwork = true;
@@ -71,7 +68,7 @@ int main(int argc, char *argv[]) {
 
             // 客户输出exit,退出
             if (strncasecmp(message, EXIT, strlen(EXIT)) == 0) {
-                isClientwork = 0;
+                isClientwork = false;
             } else {    // 子进程将信息写入管道
                 if (write(pipefd[1], message, strlen(message) - 1) < 0) {
                     error("fork error");
@@ -91,15 +88,15 @@ int main(int argc, char *argv[]) {
                 bzero(&message, BUF_SIZE);
 
                 //服务端发来消息
-                if (events[i].data.fd == clientfd) {
+                if (events[i].data.fd == client_fd) {
                     //接受服务端消息
-                    int ret = recv(clientfd, message, BUF_SIZE, 0);
+                    int ret = recv(client_fd, message, BUF_SIZE, 0);
 
                     // ret= 0 服务端关闭
                     if (ret == 0) {
-                        printf("Server closed connection: %d\n", clientfd);
-                        close(clientfd);
-                        isClientwork = 0;
+                        printf("Server closed connection: %d\n", client_fd);
+                        close(client_fd);
+                        isClientwork = false;
                     } else printf("%s\n", message);
                 }
                     //子进程写入事件发生，父进程处理并发送服务端
@@ -109,9 +106,9 @@ int main(int argc, char *argv[]) {
 
                     // ret = 0
                     if (ret == 0) {
-                        isClientwork = 0;
+                        isClientwork = false;
                     } else {   // 将信息发送给服务端
-                        send(clientfd, message, BUF_SIZE, 0);
+                        send(client_fd, message, BUF_SIZE, 0);
                     }
                 }
             }//for
@@ -121,10 +118,11 @@ int main(int argc, char *argv[]) {
     if (pid) {
         //关闭父进程和sock
         close(pipefd[0]);
-        close(clientfd);
+        close(client_fd);
     } else {
         //关闭子进程
         close(pipefd[1]);
     }
+
     return 0;
 }
