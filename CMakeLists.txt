@@ -3,14 +3,13 @@ cmake_minimum_required(VERSION 3.10)
 project(IM_server)
 add_definitions(-std=c++11)
 
-set(CLIENT "client")
-
 include_directories(./include)
 
 aux_source_directory(${PROJECT_NAME} ./src/loguru)
 
-add_executable(${PROJECT_NAME} src/server/server.cpp src/loguru/loguru.cpp)
-add_executable(${CLIENT} src/client/client.cpp )
+set(SOURCE ${SOURCE} ./src/loguru/loguru.cpp src/server/dispatcher.hpp)
+
+add_executable(${PROJECT_NAME} src/server/server.cpp ${SOURCE})
 
 target_link_libraries(
     ${PROJECT_NAME}
@@ -18,3 +17,5 @@ target_link_libraries(
     dl
 )
 
+set(CLIENT "IM_client")
+add_executable(${CLIENT} src/client/client.cpp )

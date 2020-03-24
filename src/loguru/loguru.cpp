@@ -70,7 +70,6 @@
 #include "TargetConditionals.h"
 #endif
 
-// TODO: use defined(_POSIX_VERSION) for some of these things?
 
 #if defined(_WIN32) || defined(__CYGWIN__)
 #define LOGURU_PTHREADS    0
@@ -1740,7 +1739,6 @@ namespace loguru {
 	void install_signal_handlers(bool unsafe_signal_handler)
 	{
 		(void)unsafe_signal_handler;
-		// TODO: implement signal handlers on windows
 	}
 } // namespace loguru
 
