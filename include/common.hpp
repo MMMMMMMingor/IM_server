@@ -65,7 +65,8 @@ string getTime() {
 
 #define SERVER_WELCOME "欢迎来到文明——聊天室! 您的 chat ID : Client #%d"
 
-#define SERVER_REDIRECT_MESSAGE "client %d >> %s"
+#define SERVER_REDIRECT_MESSAGE                                                \
+  "-----------------------\nclient %d ——> %s \n-----------------------\n"
 
 // exit
 #define EXIT "EXIT"

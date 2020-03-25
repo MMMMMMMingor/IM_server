@@ -4,6 +4,8 @@ compiler: gcc
 # works on Precise and Trusty
 os: linux
 script:
+  - ll /usr/local/include
+  - ll /usr/local/lib
   - bash ./build.sh
 env:
   - MATRIX_EVAL="CC=gcc-7.5 && CXX=g++-7.5"

@@ -5,6 +5,19 @@
 #include "loguru.hpp"
 
 /**
+ * 广播消息
+ * @param message
+ */
+void boardcast_message(const char *message) {
+  for (const auto &socket : clients_list) {
+    if (send(socket, message, BUF_SIZE, 0) < 0) {
+      LOG_F(ERROR, "board cast error");
+      exit(EXIT_FAILURE);
+    }
+  }
+}
+
+/**
  * 处理用户登录事件
  * @param listen_fd
  * @param epoll_fd
@@ -40,11 +53,11 @@ void client_login_handler(const int listen_fd, const int epoll_fd) {
 }
 
 /**
- * 广播消息 handler
+ * 转发消息 handler
  * @param client_fd 客户端socket文件描述符
  */
 
-void broadcast_message_handler(int client_fd) {
+void transmis_message_handler(int client_fd) {
 
   int len = 0;
   char buf[BUF_SIZE];
@@ -69,15 +82,6 @@ void broadcast_message_handler(int client_fd) {
     }
 
     sprintf(message, SERVER_REDIRECT_MESSAGE, client_fd, buf);
-
-    for (const auto &socket : clients_list) {
-      if (socket != client_fd) {
-        if (send(socket, message, BUF_SIZE, 0) < 0) {
-          LOG_F(ERROR, "board cast error");
-          exit(EXIT_FAILURE);
-        }
-      }
-    }
   }
 }
 
