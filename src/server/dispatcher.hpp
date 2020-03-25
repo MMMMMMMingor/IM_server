@@ -18,7 +18,7 @@ void dispatcher(struct epoll_event event, int listen_fd, int epoll_fd) {
     struct sockaddr_in client_address {};
     socklen_t client_addrLength = sizeof(struct sockaddr_in);
     int client_fd = accept(listen_fd, (struct sockaddr *)&client_address,
-                          &client_addrLength);
+                           &client_addrLength);
 
     LOG_F(INFO, "client connection from: %s : % d(IP : port), clientfd = %d ",
           inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port),

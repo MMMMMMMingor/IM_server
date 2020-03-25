@@ -8,6 +8,8 @@
 
 ### 使用
 ```shell
+git clone git@github.com:MMMMMMMingor/IM_server.git
+cd IM_server
 mkdir build
 cd build
 cmake ..
