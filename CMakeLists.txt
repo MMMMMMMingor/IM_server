@@ -7,7 +7,7 @@ include_directories(./include)
 
 aux_source_directory(${PROJECT_NAME} ./src/loguru)
 
-set(SOURCE ${SOURCE} ./src/loguru/loguru.cpp src/server/dispatcher.hpp)
+set(SOURCE ${SOURCE} ./src/loguru/loguru.cpp src/server/dispatcher.hpp src/server/handler.hpp)
 
 add_executable(${PROJECT_NAME} src/server/server.cpp ${SOURCE})
 
