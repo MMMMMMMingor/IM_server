@@ -44,30 +44,17 @@ void client_login_handler(const int listen_fd, const int epoll_fd) {
  * @param client_fd 客户端socket文件描述符
  */
 
-int broadcast_message_handler(int client_fd) {
+void broadcast_message_handler(int client_fd) {
 
+  int len = 0;
   char buf[BUF_SIZE];
   char message[BUF_SIZE];
   bzero(buf, BUF_SIZE); //清空初始化
   // bzero(buf, BUF_SIZE);
 
   LOG_F(INFO, "read from client(clientID = %d)", client_fd);
-  int len = 0, tmp = 0;
-  bool isClose = true;
-  string info;
 
-  while (true) {
-    tmp = recv(client_fd, buf, BUF_SIZE, 0);
-    if (isClose && tmp == 0)
-      break;
-    if (tmp != 0) {
-      isClose = false;
-      len += tmp; //总的长度
-      for (int i = 0; i < tmp; i++)
-        info += buf[i];
-    } else
-      break;
-  }
+  len = recv(client_fd, buf, BUF_SIZE, 0);
 
   if (0 == len) { // 关了， 关掉服务， 删除 user
     close(client_fd);
@@ -78,7 +65,7 @@ int broadcast_message_handler(int client_fd) {
   } else {
     if (1 == clients_list.size()) {
       send(client_fd, CAUTION, strlen(CAUTION), 0);
-      return 0;
+      LOG_F(INFO, CAUTION);
     }
 
     sprintf(message, SERVER_REDIRECT_MESSAGE, client_fd, buf);
@@ -92,8 +79,6 @@ int broadcast_message_handler(int client_fd) {
       }
     }
   }
-
-  return len;
 }
 
 #endif // !HANDLE_HPP

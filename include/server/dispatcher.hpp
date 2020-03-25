@@ -39,16 +39,14 @@ void dispatcher(struct epoll_event event, int listen_fd, int epoll_fd) {
 
   int socket_fd = event.data.fd;
 
+  check_event_type(event.events);
+
   //新用户连接
   if (socket_fd == listen_fd) {
     client_login_handler(listen_fd, epoll_fd);
   } else {
     //处理用户发来的消息，并广播，使其他用户收到信息
-    int ret = broadcast_message_handler(socket_fd);
-    if (ret < 0) {
-      LOG_F(ERROR, "error");
-      exit(EXIT_FAILURE);
-    }
+    broadcast_message_handler(socket_fd);
   }
 }
 

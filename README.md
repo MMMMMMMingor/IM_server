@@ -1,4 +1,5 @@
 # 文明——IM服务器
+![travis](https://travis-ci.org/MMMMMMMingor/IM_server.svg?branch=master)
 ### 项目介绍
 
 本项目是实现一个简单的聊天室，聊天室分为服务端和客户端。
