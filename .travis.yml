@@ -6,7 +6,7 @@ os: linux
 script:
   - wget https://github.com/protocolbuffers/protobuf/releases/download/v3.11.4/protobuf-cpp-3.11.4.tar.gz
   - tar -xzvf protobuf-cpp-3.11.4.tar.gz
-  - pushd protobuf-cpp-3.11.4 && ./configure && make && sudo make install && popd
+  - pushd protobuf-3.11.4 && ./configure && make && sudo make install && popd
   - ls -l /usr/local/include
   - bash ./build.sh
 env:
