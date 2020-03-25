@@ -1,5 +1,5 @@
-#ifndef UTILITY_H
-#define UTILITY_H
+#ifndef COMMON_H
+#define COMMON_H
 
 #include <iostream>
 #include <list>
@@ -79,4 +79,4 @@ void add_fd(int epollfd, int fd, bool enable_et) {
     setNonblock(fd);
 }
 
-#endif //UTILITY_H
+#endif //COMMON_H

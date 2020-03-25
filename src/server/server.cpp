@@ -1,7 +1,6 @@
+#include "common.hpp"
 #include "dispatcher.hpp"
-#include "handler.hpp"
 #include "loguru.hpp"
-#include "utility.hpp"
 
 int main(int argc, char *argv[]) {
   /**
