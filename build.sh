@@ -6,4 +6,4 @@ mkdir build
 cd build || exit
 cmake ..
 make
-make test
+# make test
