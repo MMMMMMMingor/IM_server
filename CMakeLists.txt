@@ -12,10 +12,10 @@ set(SOURCE ${SOURCE} ./src/loguru/loguru.cpp src/server/dispatcher.hpp src/serve
 add_executable(${PROJECT_NAME} src/server/server.cpp ${SOURCE})
 
 target_link_libraries(
-    ${PROJECT_NAME}
-    pthread
-    dl
+        ${PROJECT_NAME}
+        pthread
+        dl
 )
 
 set(CLIENT "IM_client")
-add_executable(${CLIENT} src/client/client.cpp )
+add_executable(${CLIENT} src/client/client.cpp)

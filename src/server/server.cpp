@@ -85,7 +85,6 @@ int main(int argc, char *argv[]) {
 
       // 事件分配器
       dispatcher(events[i], listener, epfd);
-
     }
   }
 
