@@ -1,6 +1,5 @@
 #ifndef DISPATCHER_HPP
 #define DISPATCHER_HPP
-
 #include "utility.hpp"
 #include "handler.hpp"
 
