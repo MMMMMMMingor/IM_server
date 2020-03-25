@@ -71,6 +71,7 @@ int main(int argc, char *argv[]) {
 
     while (isClientwork) {
       bzero(&message, BUF_SIZE);
+
       fgets(message, BUF_SIZE, stdin);
 
       // 客户输出exit,退出
