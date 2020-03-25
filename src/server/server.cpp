@@ -74,10 +74,10 @@ int main(int argc, char *argv[]) {
     // epoll_events_count表示就绪事件的数目, 这里会循环等待， 直到有事件的到来
     int epoll_events_count = epoll_wait(epfd, events, EPOLL_SIZE, -1);
     if (epoll_events_count < 0) {
-      LOG_F(ERROR, "epoll failure");
+      LOG_F(WARNING, "epoll failure");
       break;
     }
-
+ 
     LOG_F(INFO, "epoll_events_count = %d", epoll_events_count);
 
     //处理这epoll_events_count个就绪事件

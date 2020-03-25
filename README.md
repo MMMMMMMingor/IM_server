@@ -5,6 +5,9 @@
 使用TCP、 epoll多路复用技术。
 
 使用 dispatcher + handler 模式对事件进行分发处理。
+使用 proto-buf 作为序列化协议
+
+[proto-buf 安装教程](https://github.com/protocolbuffers/protobuf/tree/master/src)
 
 ### 使用
 ```shell
@@ -19,7 +22,7 @@ make
 ./IM_server 
 
 # 启动客户端
-./client 
+./IM_client 
 
 ```
 

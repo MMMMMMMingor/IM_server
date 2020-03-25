@@ -6,12 +6,38 @@
 #include "handler.hpp"
 
 /**
+ * 检测事件类型
+ * @param type 事件类型
+ */
+void check_event_type(uint32_t type) {
+  if (type & EPOLLIN)
+    LOG_F(INFO, "type check:\tEPOLLIN");
+  if (type & EPOLLOUT)
+    LOG_F(INFO, "type check:\tEPOLLOUT");
+  if (type & EPOLLRDHUP)
+    LOG_F(INFO, "type check:\tEPOLLRDHUP ");
+  if (type & EPOLLPRI)
+    LOG_F(INFO, "type check:\tEPOLLPRI");
+  if (type & EPOLLERR)
+    LOG_F(INFO, "type check:\tEPOLLERR");
+  if (type & EPOLLHUP)
+    LOG_F(INFO, "type check:\tEPOLLHUP");
+  if (type & EPOLLET)
+    LOG_F(INFO, "type check:\tEPOLLET");
+  if (type & EPOLLONESHOT)
+    LOG_F(INFO, "type check:\tEPOLLONESHOT ");
+  if (type & EPOLLWAKEUP)
+    LOG_F(INFO, "type check:\tEPOLLWAKEUP ");
+}
+
+/**
  * 事件分配器
  * @param event         事件
  * @param listen_fd     监听 socket 文件描述符
  * @param epoll_fd      epoll socket 文件描述符
  */
 void dispatcher(struct epoll_event event, int listen_fd, int epoll_fd) {
+
 
     int socket_fd = event.data.fd;
 
@@ -63,6 +89,7 @@ void dispatcher(struct epoll_event event, int listen_fd, int epoll_fd) {
             exit(EXIT_FAILURE);
         }
     }
+
 }
 
 #endif
