@@ -1,6 +1,5 @@
 #include "common.hpp"
 #include "dispatcher.hpp"
-#include "handler.hpp"
 #include "loguru.hpp"
 
 int main(int argc, char *argv[]) {
@@ -72,7 +71,7 @@ int main(int argc, char *argv[]) {
 
   //主循环
   while (true) {
-    // epoll_events_count表示就绪事件的数目
+    // epoll_events_count表示就绪事件的数目, 这里会循环等待， 直到有事件的到来
     int epoll_events_count = epoll_wait(epfd, events, EPOLL_SIZE, -1);
     if (epoll_events_count < 0) {
       LOG_F(WARNING, "epoll failure");
@@ -83,10 +82,10 @@ int main(int argc, char *argv[]) {
 
     //处理这epoll_events_count个就绪事件
     for (int i = 0; i < epoll_events_count; ++i) {
-
       // 事件分配器
       dispatcher(events[i], listener, epfd);
     }
+
   }
 
   close(listener); //关闭socket
