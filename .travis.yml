@@ -9,6 +9,6 @@ script:
   - tar -xzvf protobuf-cpp-3.11.4.tar.gz
   - pushd protobuf-3.11.4 && ./autogen.sh && ./configure && make && sudo make install && sudo ldconfig && popd
   - ls -l /usr/local/include
-  - sudo bash ./build.sh
+  - bash ./build.sh
 env:
   - MATRIX_EVAL="CC=gcc-7.5 && CXX=g++-7.5"
