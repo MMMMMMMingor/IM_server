@@ -46,7 +46,7 @@ void dispatcher(struct epoll_event event, int listen_fd, int epoll_fd) {
     client_login_handler(listen_fd, epoll_fd);
   } else {
     //处理用户发来的消息，并转发
-    transmis_message_handler(socket_fd);
+    transmit_message_handler(socket_fd);
   }
 }
 

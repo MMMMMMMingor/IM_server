@@ -7,7 +7,7 @@ include_directories(./include)
 include_directories(./src/message)
 
 
-set(SOURCE ${SOURCE} src/loguru/loguru.cpp src/message/addressbook.pb.cc)
+set(SOURCE ${SOURCE} src/loguru/loguru.cpp src/message/addressbook.pb.cc src/message/message.pb.cc)
 
 add_executable(${PROJECT_NAME} src/server/server.cpp ${SOURCE})
 
@@ -21,7 +21,14 @@ target_link_libraries(
 ############### 客户端编译 ###############
 
 set(CLIENT "IM_client")
-add_executable(${CLIENT} src/client/client.cpp)
+add_executable(${CLIENT} src/client/client.cpp ${SOURCE})
+
+target_link_libraries(
+        ${CLIENT}
+        pthread
+        dl
+        protobuf
+)
 
 
 ############### protobuf 测试 ###############

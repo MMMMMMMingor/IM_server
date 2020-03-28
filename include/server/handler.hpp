@@ -56,8 +56,7 @@ void client_login_handler(const int listen_fd, const int epoll_fd) {
  * 转发消息 handler
  * @param client_fd 客户端socket文件描述符
  */
-
-void transmis_message_handler(int client_fd) {
+void transmit_message_handler(int client_fd) {
 
   int len = 0;
   char buf[BUF_SIZE];
