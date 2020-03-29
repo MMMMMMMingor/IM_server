@@ -7,7 +7,7 @@ gcc7.5、Linux2.6-epoll、protoc
 
 使用 dispatcher + handler 模式对事件进行分发处理。
 
-使用 proto-buffer 作为序列化协议
+使用 protocol-buffer 作为序列化协议
 
 [protobuf 安装](https://github.com/protocolbuffers/protobuf/tree/master/src)
 

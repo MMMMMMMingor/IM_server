@@ -1,4 +1,5 @@
 #include "common.hpp"
+#include "message.pb.h"
 
 int main(int argc, char *argv[]) {
   /**
@@ -77,6 +78,7 @@ int main(int argc, char *argv[]) {
       // 客户输出exit,退出
       if (strncasecmp(message, EXIT, strlen(EXIT)) == 0) {
         isClientwork = false;
+        write(pipefd[1], message, 0);
       } else { // 子进程将信息写入管道
         if (write(pipefd[1], message, strlen(message) - 1) < 0) {
           error("fork error");
@@ -98,26 +100,63 @@ int main(int argc, char *argv[]) {
         //服务端发来消息
         if (events[i].data.fd == client_fd) {
           //接受服务端消息
-          int ret = recv(client_fd, message, BUF_SIZE, 0);
 
-          // ret= 0 服务端关闭
-          if (ret == 0) {
-            printf("Server closed connection: %d\n", client_fd);
-            close(client_fd);
+          im_message::Message response;
+          response.ParseFromFileDescriptor(client_fd);
+
+          switch (response.type()) {
+          case im_message::HeadType::MESSAGE_RESPONSE: {
+            printf("%s\n", response.messageresponse().info().c_str());
+          }
+          case im_message::HeadType::MESSAGE_NOTIFICATION: {
+            printf("%s\n", response.notification().json().c_str());
+          }
+          case im_message::LOGIN_REQUEST:
+            break;
+          case im_message::LOGIN_RESPONSE:
+            break;
+          case im_message::LOGOUT_REQUEST:
+            break;
+          case im_message::LOGOUT_RESPONSE: {
             isClientwork = false;
-          } else
-            printf("%s\n", message);
+          }
+          case im_message::KEEPALIVE_REQUEST:
+            break;
+          case im_message::KEEPALIVE_RESPONSE:
+            break;
+          case im_message::MESSAGE_REQUEST:
+            break;
+          case im_message::HeadType_INT_MIN_SENTINEL_DO_NOT_USE_:
+            break;
+          case im_message::HeadType_INT_MAX_SENTINEL_DO_NOT_USE_:
+            break;
+          }
+
         }
         //子进程写入事件发生，父进程处理并发送服务端
         else {
           //父进程从管道中读取数据
           int ret = read(events[i].data.fd, message, BUF_SIZE);
+          if (ret == 0) {
+
+            im_message::Message request;
+            request.set_type(im_message::HeadType::LOGOUT_REQUEST);
+
+            request.SerializeToFileDescriptor(client_fd);
+            printf("logout\n");
+            continue;
+          }
+          im_message::Message request;
+          auto *message_request = new im_message::MessageRequest{};
+          message_request->set_content(message);
+          request.set_allocated_messagerequest(message_request);
+          request.set_type(im_message::HeadType::MESSAGE_REQUEST);
+
+          bool success = request.SerializeToFileDescriptor(client_fd);
 
           // ret = 0
-          if (ret == 0) {
+          if (!success) {
             isClientwork = false;
-          } else { // 将信息发送给服务端
-            send(client_fd, message, BUF_SIZE, 0);
           }
         }
       } // for

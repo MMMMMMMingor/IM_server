@@ -3,18 +3,32 @@
 
 #include "common.hpp"
 #include "loguru.hpp"
+#include "message.pb.h"
+#include <string>
 
 /**
  * 广播消息
  * @param message
  */
-void boardcast_message(const char *message) {
+void board_cast_message(const std::string &message) {
+  im_message::Message response;
+  response.set_type(im_message::HeadType::MESSAGE_RESPONSE);
+  auto *message_response = new im_message::MessageResponse();
+  message_response->set_info(message);
+  response.set_allocated_messageresponse(message_response);
+  LOG_F(INFO, "board cast start : %s", message.c_str());
+
   for (const auto &socket : clients_list) {
-    if (send(socket, message, BUF_SIZE, 0) < 0) {
+
+    bool success = response.SerializeToFileDescriptor(socket);
+
+    if (!success) {
       LOG_F(ERROR, "board cast error");
       exit(EXIT_FAILURE);
     }
   }
+
+  LOG_F(INFO, "board cast finished!");
 }
 
 /**
@@ -45,8 +59,15 @@ void client_login_handler(const int listen_fd, const int epoll_fd) {
   char message[BUF_SIZE];
   bzero(message, BUF_SIZE);
   sprintf(message, SERVER_WELCOME, client_fd);
-  int ret = send(client_fd, message, BUF_SIZE, 0);
-  if (ret < 0) {
+
+  im_message::Message response;
+  auto *message_notification = new im_message::MessageNotification();
+  message_notification->set_json(message);
+  response.set_allocated_notification(message_notification);
+
+  bool success = response.SerializeToFileDescriptor(client_fd);
+
+  if (!success) {
     LOG_F(ERROR, "send error");
     exit(EXIT_FAILURE);
   }
@@ -58,29 +79,41 @@ void client_login_handler(const int listen_fd, const int epoll_fd) {
  */
 void transmit_message_handler(int client_fd) {
 
-  int len = 0;
-  char buf[BUF_SIZE];
-  char message[BUF_SIZE];
-  bzero(buf, BUF_SIZE); //清空初始化
-  // bzero(buf, BUF_SIZE);
-
   LOG_F(INFO, "read from client(clientID = %d)", client_fd);
 
-  len = recv(client_fd, buf, BUF_SIZE, 0);
+  im_message::Message request;
+  request.ParseFromFileDescriptor(client_fd);
 
-  if (0 == len) { // 关了， 关掉服务， 删除 user
+  if (im_message::HeadType::LOGOUT_REQUEST ==
+      request.type()) { // 关了， 关掉服务， 删除 user
+    im_message::Message response;
+    response.set_type(im_message::HeadType::LOGOUT_RESPONSE);
+    response.SerializeToFileDescriptor(client_fd);
+
     close(client_fd);
     clients_list.remove(client_fd);
+
+    std::string message{"用户下线"};
+    board_cast_message(message);
+
     LOG_F(INFO,
           "ClientID = %d closed. now there are %d client in the char room",
           client_fd, (int)clients_list.size());
-  } else {
-    if (1 == clients_list.size()) {
-      send(client_fd, CAUTION, strlen(CAUTION), 0);
-      LOG_F(INFO, CAUTION);
-    }
 
-    sprintf(message, SERVER_REDIRECT_MESSAGE, client_fd, buf);
+  } else { // 当前只有一个用户
+    if (1 == clients_list.size()) {
+      im_message::Message response;
+      response.set_type(im_message::HeadType::MESSAGE_NOTIFICATION);
+      auto *message_notification = new im_message::MessageNotification();
+      message_notification->set_json(CAUTION);
+      response.set_allocated_notification(message_notification);
+
+      response.SerializeToFileDescriptor(client_fd);
+
+      LOG_F(INFO, CAUTION);
+    } else {
+      board_cast_message(request.messagerequest().content());
+    }
   }
 }
 
