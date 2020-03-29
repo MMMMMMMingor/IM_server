@@ -7,7 +7,7 @@ include_directories(./include)
 include_directories(./src/message)
 
 
-set(SOURCE ${SOURCE} src/loguru/loguru.cpp src/message/addressbook.pb.cc src/message/message.pb.cc)
+set(SOURCE ${SOURCE} src/loguru/loguru.cpp src/message/message.pb.cc)
 
 add_executable(${PROJECT_NAME} src/server/server.cpp ${SOURCE})
 
@@ -34,22 +34,8 @@ target_link_libraries(
 ############### protobuf 测试 ###############
 enable_testing()
 
-add_executable(write_protobuf_test test/write_protobuf_test.cpp src/message/addressbook.pb.cc)
-add_test(NAME write_message_test COMMAND write_protobuf_test "addressbook.txt")
-SET_TESTS_PROPERTIES(write_message_test
-        PROPERTIES PASS_REGULAR_EXPRESSION "finished")
+add_executable(test_add test/test.cpp)
+add_test(NAME test COMMAND test_add 1 2)
+SET_TESTS_PROPERTIES(test
+        PROPERTIES PASS_REGULAR_EXPRESSION "3")
 
-target_link_libraries(
-        write_protobuf_test
-        protobuf
-)
-
-add_executable(read_protobuf_test test/read_protobuf_test.cpp src/message/addressbook.pb.cc)
-add_test(NAME read_message_test COMMAND read_protobuf_test "addressbook.txt")
-SET_TESTS_PROPERTIES(read_message_test
-        PROPERTIES PASS_REGULAR_EXPRESSION "1  mingor  mmmmingor@gmail.com    Mobile phone #: 8888888")
-
-target_link_libraries(
-        read_protobuf_test
-        protobuf
-)
