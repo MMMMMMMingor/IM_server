@@ -18,11 +18,9 @@ enum HeadType {
 // LoginRequest对应的HeadType为Login_Request
 // 消息名称去掉下划线，更加符合Java 的类名规范
 message LoginRequest {
-    string uid = 1; // 用户唯一id
-    string deviceId = 2; // 设备ID
-    string token = 3; // 用户token
-    uint32 platform = 4; //客户端平台 windows、mac、android、ios、web
-    string app_version = 5; // APP版本号
+    string username = 1; // 用户唯一id
+    string password = 2; // 设备ID
+    string platform = 3; //客户端平台 windows、mac、android、ios、web
 }
 
 //token说明: 账号服务器登录时生成的Token
@@ -32,7 +30,6 @@ message LoginResponse {
     bool result = 1; //true 表示成功，false表示失败
     uint32 code = 2; //错误码
     string info = 3; //错误描述
-    uint32 expose = 4; //错误描述是否提示给用户:1 提示;0 不提示
 }
 
 /*聊天消息*/
@@ -59,7 +56,7 @@ message MessageResponse {
     fixed32 block_index = 6;
 }
 
-/*通知消息*/
+/*系统通知消息*/
 message MessageNotification {
     uint32 msg_type = 1; //通知类型 1 上线 2 下线 ...
     bytes sender = 2;
