@@ -119,6 +119,7 @@ int main(int argc, char *argv[]) {
             break;
           case im_message::LOGOUT_RESPONSE: {
             isClientwork = false;
+            break;
           }
           case im_message::KEEPALIVE_REQUEST:
             break;

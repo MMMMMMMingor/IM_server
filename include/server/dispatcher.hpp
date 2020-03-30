@@ -43,10 +43,38 @@ void dispatcher(struct epoll_event event, int listen_fd, int epoll_fd) {
 
   //新用户连接
   if (socket_fd == listen_fd) {
-    client_login_handler(listen_fd, epoll_fd);
-  } else {
-    //处理用户发来的消息，并转发
-    transmit_message_handler(socket_fd);
+    add_client_handler(listen_fd, epoll_fd);
+  } else { // 业务处理
+    im_message::Message message;
+    message.ParseFromFileDescriptor(socket_fd);
+
+    switch (message.type()) {
+    case im_message::LOGIN_REQUEST:
+      break;
+    case im_message::LOGIN_RESPONSE:
+      break;
+    case im_message::LOGOUT_REQUEST:
+      client_logout_handler(socket_fd);
+      break;
+    case im_message::LOGOUT_RESPONSE:
+      break;
+    case im_message::KEEPALIVE_REQUEST:
+      break;
+    case im_message::KEEPALIVE_RESPONSE:
+      break;
+    case im_message::MESSAGE_REQUEST:
+      //处理用户发来的消息，并转发
+      transmit_message_handler(socket_fd, message);
+      break;
+    case im_message::MESSAGE_RESPONSE:
+      break;
+    case im_message::MESSAGE_NOTIFICATION:
+      break;
+    case im_message::HeadType_INT_MIN_SENTINEL_DO_NOT_USE_:
+      break;
+    case im_message::HeadType_INT_MAX_SENTINEL_DO_NOT_USE_:
+      break;
+    }
   }
 }
 

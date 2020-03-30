@@ -31,7 +31,7 @@ target_link_libraries(
 )
 
 
-############### protobuf 测试 ###############
+############### 测试 ###############
 enable_testing()
 
 add_executable(test_add test/test.cpp)

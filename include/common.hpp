@@ -55,7 +55,7 @@ string getTime() {
 #define SERVER_IP "127.0.0.1"
 
 // server port
-#define SERVER_PORT 8888
+#define SERVER_PORT 9999
 
 // epoll size
 #define EPOLL_SIZE 5000
@@ -64,9 +64,6 @@ string getTime() {
 #define BUF_SIZE 0xFFFF
 
 #define SERVER_WELCOME "欢迎来到文明——聊天室! 您的 chat ID : Client #%d"
-
-#define SERVER_REDIRECT_MESSAGE                                                \
-  "-----------------------\nclient %d ——> %s \n-----------------------\n"
 
 // exit
 #define EXIT "EXIT"

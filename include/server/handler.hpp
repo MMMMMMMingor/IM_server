@@ -36,7 +36,7 @@ void board_cast_message(const std::string &message) {
  * @param listen_fd
  * @param epoll_fd
  */
-void client_login_handler(const int listen_fd, const int epoll_fd) {
+void add_client_handler(const int listen_fd, const int epoll_fd) {
   struct sockaddr_in client_address {};
   socklen_t client_addrLength = sizeof(struct sockaddr_in);
   int client_fd =
@@ -74,46 +74,46 @@ void client_login_handler(const int listen_fd, const int epoll_fd) {
 }
 
 /**
+ * 用户下线
+ * @param client_fd
+ */
+void client_logout_handler(int client_fd) {
+  im_message::Message response;
+  response.set_type(im_message::HeadType::LOGOUT_RESPONSE);
+  response.SerializeToFileDescriptor(client_fd);
+
+  close(client_fd);
+  clients_list.remove(client_fd);
+
+  std::string message{"用户下线"};
+  board_cast_message(message);
+
+  LOG_F(INFO, "ClientID = %d closed. now there are %d client in the char room",
+        client_fd, (int)clients_list.size());
+}
+
+/**
  * 转发消息 handler
  * @param client_fd 客户端socket文件描述符
+ * @param message 消息
  */
-void transmit_message_handler(int client_fd) {
+void transmit_message_handler(int client_fd, im_message::Message &message) {
 
   LOG_F(INFO, "read from client(clientID = %d)", client_fd);
 
-  im_message::Message request;
-  request.ParseFromFileDescriptor(client_fd);
-
-  if (im_message::HeadType::LOGOUT_REQUEST ==
-      request.type()) { // 关了， 关掉服务， 删除 user
+  // 当前只有一个用户在线
+  if (1 == clients_list.size()) {
     im_message::Message response;
-    response.set_type(im_message::HeadType::LOGOUT_RESPONSE);
+    response.set_type(im_message::HeadType::MESSAGE_NOTIFICATION);
+    auto *message_notification = new im_message::MessageNotification();
+    message_notification->set_json(CAUTION);
+    response.set_allocated_notification(message_notification);
+
     response.SerializeToFileDescriptor(client_fd);
 
-    close(client_fd);
-    clients_list.remove(client_fd);
-
-    std::string message{"用户下线"};
-    board_cast_message(message);
-
-    LOG_F(INFO,
-          "ClientID = %d closed. now there are %d client in the char room",
-          client_fd, (int)clients_list.size());
-
-  } else { // 当前只有一个用户
-    if (1 == clients_list.size()) {
-      im_message::Message response;
-      response.set_type(im_message::HeadType::MESSAGE_NOTIFICATION);
-      auto *message_notification = new im_message::MessageNotification();
-      message_notification->set_json(CAUTION);
-      response.set_allocated_notification(message_notification);
-
-      response.SerializeToFileDescriptor(client_fd);
-
-      LOG_F(INFO, CAUTION);
-    } else {
-      board_cast_message(request.messagerequest().content());
-    }
+    LOG_F(INFO, CAUTION);
+  } else {
+    board_cast_message(message.messagerequest().content());
   }
 }
 
