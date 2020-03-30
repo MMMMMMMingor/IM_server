@@ -105,7 +105,10 @@ int main(int argc, char *argv[]) {
         //处理这epoll_events_count个就绪事件
         for (int i = 0; i < epoll_events_count; ++i) {
             // 事件分配器到线程池
-            pool->addTask(dispatcher, ARG(events[i], listener, epfd));
+            while (!(pool->addTask(dispatcher, ARG(events[i], listener, epfd)))) {
+                LOG_F(INFO,"服务器宕机了");
+                sleep(100);
+            }
             //dispatcher(events[i], listener, epfd);
 
         }
