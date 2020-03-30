@@ -171,6 +171,8 @@ int main(int argc, char *argv[]) {
           case im_message::KEEPALIVE_RESPONSE:
             break;
           case im_message::MESSAGE_REQUEST:
+            printf("%s -> %s\n", response.messagerequest().from_nick().c_str(),
+                   response.messagerequest().content().c_str());
             break;
           case im_message::HeadType_INT_MIN_SENTINEL_DO_NOT_USE_:
             break;

@@ -4,6 +4,7 @@
 #include "common.hpp"
 #include "loguru.hpp"
 #include "message.pb.h"
+#include "session.hpp"
 #include <string>
 
 /**

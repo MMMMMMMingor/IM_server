@@ -5,7 +5,7 @@ int main(int argc, char *argv[]) {
   Yaml::Parse(root, "../config/server.yml");
 
   // Print all scalars.
-  std::cout << root["server"]["ip"].As<std::string>() << std::endl;
+  std::cout << root["server"]["port"].As<int>() << std::endl;
 
   return 0;
 }
