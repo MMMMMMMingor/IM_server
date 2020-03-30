@@ -13,7 +13,6 @@
 void board_cast_message(const im_message::Message &message) {
 
   for (const auto &socket : clients_list) {
-    LOG_F(INFO, "board cast %i", socket);
 
     bool success = message.SerializeToFileDescriptor(socket);
 
@@ -43,14 +42,14 @@ void notification(const std::string &message) {
  * 消息返回
  * @param message 消息
  */
-void message_response(const std::string &message) {
+void response(const std::string &message, int client_fd) {
   im_message::Message response;
   response.set_type(im_message::HeadType::MESSAGE_RESPONSE);
   auto *message_response = new im_message::MessageResponse;
   message_response->set_info(message);
   response.set_allocated_messageresponse(message_response);
 
-  board_cast_message(response);
+  response.SerializeToFileDescriptor(client_fd);
 }
 
 /**
@@ -134,9 +133,9 @@ void client_logout_handler(int client_fd) {
 }
 
 /**
- * 转发消息 handler
- * @param client_fd 客户端socket文件描述符
- * @param message 消息
+ * 转发消息               handler
+ * @param client_fd     客户端socket文件描述符
+ * @param message       消息
  */
 void transmit_message_handler(
     int client_fd, const im_message::MessageRequest &message_request) {
@@ -152,7 +151,8 @@ void transmit_message_handler(
     LOG_F(INFO, CAUTION);
   } else {
     // 消息转发
-    std::string redirect = message_request.from();
+    //    std::string redirect = message_request.from()
+    std::string redirect;
     redirect += " -> ";
     redirect += message_request.content();
     notification(redirect);

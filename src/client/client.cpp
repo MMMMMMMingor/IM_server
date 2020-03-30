@@ -12,7 +12,7 @@ static uint16_t SERVER_PORT;
 /**
  * 初始化服务器参数
  */
-void configuration() {
+void client_configuration() {
   Yaml::Node root;
   Yaml::Parse(root, "../config/client.yml");
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
    * 1:创建套接字socket
    * param1:指定地址族为IPv4;param2:指定传输协议为流式套接字;param3:指定传输协议为TCP,可设为0,由系统推导
    */
-  configuration();
+  client_configuration();
 
   int client_fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (client_fd < 0) {
@@ -196,7 +196,6 @@ int main(int argc, char *argv[]) {
           request.set_type(im_message::HeadType::MESSAGE_REQUEST);
           auto *message_request = new im_message::MessageRequest{};
           message_request->set_content(message);
-          message_request->set_from(username);
           request.set_allocated_messagerequest(message_request);
 
           bool success = request.SerializeToFileDescriptor(client_fd);
