@@ -35,15 +35,15 @@ ThreadPool::~ThreadPool() {
     LOG_F(INFO, "ThreadPool is destroyed!!");
 }
 
-bool ThreadPool::addTask(Task task,ARG arg) {
+bool ThreadPool::addTask(Task task, ARG arg) {
     // 首先先获取锁
     pthread_mutex_lock(&lock);
     if (taskQueue.size() >= this->maxCount) {
-        LOG_F(INFO, "the task queue is full!!!,some task will be rejected");
+        LOG_F(WARNING, "the task queue is full!!!,some task will be rejected");
         pthread_mutex_unlock((&lock));
         return false;  // 返回错误
     }
-    this->taskQueue.push(std::make_pair(task,arg));
+    this->taskQueue.push(std::make_pair(task, arg));
     pthread_cond_broadcast(&empty);
     pthread_mutex_unlock(&lock);
     return true;
@@ -56,12 +56,12 @@ void *ThreadPool::start(void *arg) {
     while (true) {
         pthread_mutex_lock(&pool->lock);
         while (pool->taskQueue.empty()) {
-            LOG_F(INFO, "thread: %d\tNo task go to sleep!!!",((unsigned) pthread_self() % 100));
+            LOG_F(INFO, "thread: %d\tNo task go to sleep!!!", ((unsigned) pthread_self() % 100));
             pthread_cond_wait(&pool->empty, &pool->lock);
         }
         auto task = pool->taskQueue.front();
         pool->taskQueue.pop();
         pthread_mutex_unlock(&pool->lock);
-        task.first(task.second.event,task.second.listen_fd,task.second.epoll_fd);
+        task.first(task.second.event, task.second.listen_fd, task.second.epoll_fd);
     }
 }
