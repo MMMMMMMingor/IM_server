@@ -19,9 +19,9 @@
 
 #include <time.h>
 
-
 // clients_list save all the clients's socket
 std::list<int> clients_list;
+
 
 std::string getTime() {
   time_t timep;
