@@ -1,5 +1,30 @@
 #include "common.hpp"
 #include "message.pb.h"
+#include <iostream>
+#include <string>
+
+std::string username;
+std::string password;
+
+/**
+ * 登录
+ * @param client_fd
+ */
+void login(const int client_fd) {
+
+  std::cout << "用户名：";
+  std::cin >> username;
+  std::cout << "密码：";
+  std::cin >> password;
+
+  im_message::Message request;
+  request.set_type(im_message::HeadType::LOGIN_REQUEST);
+  auto *login_request = new im_message::LoginRequest;
+  login_request->set_username(username);
+  login_request->set_password(password);
+  request.set_allocated_loginrequest(login_request);
+  request.SerializeToFileDescriptor(client_fd);
+}
 
 int main(int argc, char *argv[]) {
   /**
@@ -61,6 +86,8 @@ int main(int argc, char *argv[]) {
   // 聊天信息缓冲区
   char message[BUF_SIZE];
 
+  login(client_fd);
+
   // Fork
   int pid = fork();
   if (pid < 0) {
@@ -109,11 +136,13 @@ int main(int argc, char *argv[]) {
             printf("%s\n", response.messageresponse().info().c_str());
           }
           case im_message::HeadType::MESSAGE_NOTIFICATION: {
-            printf("%s\n", response.notification().json().c_str());
+            printf("%s %s\n", response.notification().timestamp().c_str(),
+                   response.notification().json().c_str());
           }
           case im_message::LOGIN_REQUEST:
             break;
           case im_message::LOGIN_RESPONSE:
+            printf("%s\n", response.loginresponse().info().c_str());
             break;
           case im_message::LOGOUT_REQUEST:
             break;
@@ -148,10 +177,11 @@ int main(int argc, char *argv[]) {
             continue;
           }
           im_message::Message request;
+          request.set_type(im_message::HeadType::MESSAGE_REQUEST);
           auto *message_request = new im_message::MessageRequest{};
           message_request->set_content(message);
+          message_request->set_from(username);
           request.set_allocated_messagerequest(message_request);
-          request.set_type(im_message::HeadType::MESSAGE_REQUEST);
 
           bool success = request.SerializeToFileDescriptor(client_fd);
 

@@ -19,31 +19,11 @@
 
 #include <time.h>
 
-using std::string;
-
-struct USER {
-  string addr;
-  int port;
-  string inTime;
-  USER(string a, int p, string i)
-      : addr(a), port(p), inTime(i) {}
-};
-
-struct MSG {
-  int num;     // 第几条消息， 到一定数量自动删除
-  string time; // 消息时间
-  USER *user;  // 指向user， 空则为下线
-  string info; // 发来的二进制消息
-};
 
 // clients_list save all the clients's socket
 std::list<int> clients_list;
 
-std::map<int, USER *> users; // 在线用户的信息, 通过 client_list 找
-
-std::list<MSG> msg; // 存储所有的信息
-
-string getTime() {
+std::string getTime() {
   time_t timep;
   time(&timep);
   char tmp[64];
