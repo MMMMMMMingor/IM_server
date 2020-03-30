@@ -7,9 +7,9 @@ include_directories(./include)
 include_directories(./src/message)
 
 
-set(SOURCE ${SOURCE} src/loguru/loguru.cpp src/message/message.pb.cc)
+set(SOURCE ${SOURCE} src/loguru/loguru.cpp src/yaml/yaml.cpp src/message/message.pb.cc)
 
-add_executable(${PROJECT_NAME} src/server/server.cpp ${SOURCE})
+add_executable(${PROJECT_NAME} src/server/server.cpp ${SOURCE} include/yaml.hpp src/yaml/yaml.cpp)
 
 target_link_libraries(
         ${PROJECT_NAME}
@@ -34,8 +34,13 @@ target_link_libraries(
 ############### 测试 ###############
 enable_testing()
 
-add_executable(test_add test/test.cpp)
-add_test(NAME test COMMAND test_add 1 2)
-SET_TESTS_PROPERTIES(test
+add_executable(test_add test/test_add.cpp)
+add_test(NAME test_add COMMAND test_add 1 2)
+SET_TESTS_PROPERTIES(test_add
         PROPERTIES PASS_REGULAR_EXPRESSION "3")
+
+add_executable(test_yaml test/test_yaml.cpp src/yaml/yaml.cpp)
+add_test(NAME test_yaml COMMAND test_yaml)
+SET_TESTS_PROPERTIES(test_yaml
+        PROPERTIES PASS_REGULAR_EXPRESSION "127.0.0.1")
 

@@ -2,9 +2,23 @@
 #include "message.pb.h"
 #include <iostream>
 #include <string>
+#include <yaml.hpp>
 
-std::string username;
-std::string password;
+static std::string username;
+static std::string password;
+static std::string SERVER_IP;
+static uint16_t SERVER_PORT;
+
+/**
+ * 初始化服务器参数
+ */
+void configuration() {
+  Yaml::Node root;
+  Yaml::Parse(root, "../config/client.yml");
+
+  SERVER_IP = root["server"]["ip"].As<std::string>();
+  SERVER_PORT = root["server"]["port"].As<uint16_t>();
+}
 
 /**
  * 登录
@@ -39,6 +53,8 @@ int main(int argc, char *argv[]) {
    * 1:创建套接字socket
    * param1:指定地址族为IPv4;param2:指定传输协议为流式套接字;param3:指定传输协议为TCP,可设为0,由系统推导
    */
+  configuration();
+
   int client_fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (client_fd < 0) {
     error("socket error");
@@ -48,7 +64,7 @@ int main(int argc, char *argv[]) {
   struct sockaddr_in serverAddr {};
   serverAddr.sin_family = AF_INET;
   serverAddr.sin_port = htons(SERVER_PORT);
-  serverAddr.sin_addr.s_addr = inet_addr(SERVER_IP);
+  serverAddr.sin_addr.s_addr = inet_addr(SERVER_IP.c_str());
 
   // 2:连接服务端
   if (connect(client_fd, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) <
@@ -70,7 +86,7 @@ int main(int argc, char *argv[]) {
    * 4:分别处理就绪的事件集合
    */
   // 创建epoll
-  int epfd = epoll_create(EPOLL_SIZE);
+  int epfd = epoll_create(2);
   if (epfd < 0) {
     error("epfd error");
   }

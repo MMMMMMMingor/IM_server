@@ -1,6 +1,23 @@
 #include "common.hpp"
 #include "loguru.hpp"
 #include "server/dispatcher.hpp"
+#include <yaml.hpp>
+
+static std::string SERVER_IP;
+static uint16_t SERVER_PORT;
+static int EPOLL_SIZE;
+
+/**
+ * 初始化服务器参数
+ */
+void configuration() {
+  Yaml::Node root;
+  Yaml::Parse(root, "../config/server.yml");
+
+  SERVER_IP = root["server"]["ip"].As<std::string>();
+  SERVER_PORT = root["server"]["port"].As<uint16_t>();
+  EPOLL_SIZE = root["server"]["epoll"]["size"].As<int>();
+}
 
 int main(int argc, char *argv[]) {
   /**
@@ -19,6 +36,7 @@ int main(int argc, char *argv[]) {
   // 初始化 loguru 日志库
   loguru::init(argc, argv);
 
+  configuration();
   /**
    * 1:创建套接字socket
    * param1:指定地址族为IPv4;param2:指定传输协议为流式套接字;param3:指定传输协议为TCP,可设为0,由系统推导
@@ -41,7 +59,7 @@ int main(int argc, char *argv[]) {
   struct sockaddr_in serverAddr {};
   serverAddr.sin_family = PF_INET;
   serverAddr.sin_port = htons(SERVER_PORT);
-  serverAddr.sin_addr.s_addr = inet_addr(SERVER_IP);
+  serverAddr.sin_addr.s_addr = inet_addr(SERVER_IP.c_str());
 
   //绑定地址
   if (bind(listener, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0) {
@@ -55,7 +73,7 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  LOG_F(INFO, "Start to listen: %s", SERVER_IP);
+  LOG_F(INFO, "Start to listen: %s", SERVER_IP.c_str());
 
   //在内核中创建事件表
   int epfd = epoll_create(EPOLL_SIZE);
@@ -65,7 +83,7 @@ int main(int argc, char *argv[]) {
   }
 
   LOG_F(INFO, "epoll created, epollfd = %d", epfd);
-  static struct epoll_event events[EPOLL_SIZE];
+  struct epoll_event events[EPOLL_SIZE];
   //往内核事件表里添加事件
   add_fd(epfd, listener, true);
 
@@ -85,7 +103,6 @@ int main(int argc, char *argv[]) {
       // 事件分配器
       dispatcher(events[i], listener, epfd);
     }
-
   }
 
   close(listener); //关闭socket

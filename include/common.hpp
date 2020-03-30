@@ -31,14 +31,14 @@ std::string getTime() {
   return tmp; //自动转型
 }
 
-// server ip
-#define SERVER_IP "127.0.0.1"
-
-// server port
-#define SERVER_PORT 9999
-
-// epoll size
-#define EPOLL_SIZE 5000
+//// server ip
+//#define SERVER_IP "127.0.0.1"
+//
+//// server port
+//#define SERVER_PORT 9999
+//
+//// epoll size
+//#define EPOLL_SIZE 5000
 
 // message buffer size
 #define BUF_SIZE 0xFFFF
