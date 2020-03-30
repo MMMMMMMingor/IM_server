@@ -3,3 +3,6 @@ server:
   port: 9999
   epoll:
     size: 5000
+  threadPool:
+    threadNum: 4
+    threadQueueSize: 1000
