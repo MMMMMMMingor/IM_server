@@ -4,5 +4,6 @@ server:
   epoll:
     size: 5000
   threadPool:
-    threadNum: 4
-    threadQueueSize: 1000
+    min: 4
+    max: 8
+    queueSize: 1000

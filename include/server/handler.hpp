@@ -134,7 +134,7 @@ void client_logout_handler(int client_fd) {
 }
 
 /**
- * 转发消息               handler
+ * 转发消息handler
  * @param client_fd     客户端socket文件描述符
  * @param message       消息
  */

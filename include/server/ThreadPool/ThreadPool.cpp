@@ -2,66 +2,67 @@
 // Created by Firefly on 2020/3/30.
 //
 
-#include <pthread.h>
+#include "ThreadPool.h"
 #include <iostream>
 #include <loguru.hpp>
-#include "ThreadPool.h"
-
+#include <pthread.h>
+#include <thread>
+#include <utility>
 
 //构造函数,确定线程池的线程数
-ThreadPool::ThreadPool(size_t cntThread, size_t maxCount) {
-    //初始化条件变量与互斥量
-    pthread_mutex_init(&lock, nullptr);
-    pthread_cond_init(&empty, nullptr);
+ThreadPool::ThreadPool(size_t min, size_t max, size_t size)
+    : m_mutex{}, m_condition_variable{}, m_cur_count{0}, m_min_count{min},
+      m_max_count{max}, m_max_queue_size{size} {
 
-    this->maxCount = maxCount;
-
-    //创建线程
-    std::cout << "main pthread pid is " << ((unsigned) pthread_self() % 100) << std::endl;
-
-    pthread_t pid[cntThread];
-    for (int i = 0; i < cntThread; i++) {
-        // 第一个  就是 控制这个线程 句柄上面的数组
-        // 第二个 是设置新的线程的，栈大小等等信息，默认为空就可以了
-        // 第3个参数是一个函数指针，它返回void * 参数也是void *, 回调函数
-        // 第四个 参数是线程的参数
-        int ret = pthread_create(pid + i, NULL, start, this);
-    }
+  LOG_F(INFO, "main pthread pid is %d", std::this_thread::get_id());
 }
 
-ThreadPool::~ThreadPool() {
-    pthread_cond_destroy(&empty);
-    pthread_mutex_destroy(&lock);
-    LOG_F(INFO, "ThreadPool is destroyed!!");
-}
+ThreadPool::~ThreadPool() { LOG_F(INFO, "ThreadPool is destroyed!!"); }
 
 bool ThreadPool::addTask(Task task, ARG arg) {
-    // 首先先获取锁
-    pthread_mutex_lock(&lock);
-    if (taskQueue.size() >= this->maxCount) {
-        LOG_F(WARNING, "the task queue is full!!!,some task will be rejected");
-        pthread_mutex_unlock((&lock));
-        return false;  // 返回错误
-    }
-    this->taskQueue.push(std::make_pair(task, arg));
-    pthread_cond_broadcast(&empty);
-    pthread_mutex_unlock(&lock);
-    return true;
+  // 首先先获取锁
+  std::lock_guard<std::mutex> lock_guard(m_mutex);
+
+  if (m_cur_count < m_max_count) {
+    m_cur_count++;
+    std::thread t(start, this);
+    t.detach();
+  }
+
+  if (m_task_queue.size() >= this->m_max_queue_size) {
+    LOG_F(WARNING, "the task queue is full!!!,some task will be rejected");
+    return false; // 返回错误
+  }
+
+  this->m_task_queue.push(std::make_pair(task, arg));
+
+  m_condition_variable.notify_one();
+
+  return true;
 }
 
 // 静态函数， 非成员函数调用
 void *ThreadPool::start(void *arg) {
-    ThreadPool *pool = (ThreadPool *) arg;
-    LOG_F(INFO, "\"create thread %d\"", ((unsigned) pthread_self() % 100));
-    while (true) {
-        pthread_mutex_lock(&pool->lock);
-        while (pool->taskQueue.empty()) {
-            LOG_F(INFO, "thread: %d\tNo task go to sleep!!!", ((unsigned) pthread_self() % 100));
-            pthread_cond_wait(&pool->empty, &pool->lock);
-        }
-        auto task = pool->taskQueue.front();
-        pool->taskQueue.pop();
-        pthread_mutex_unlock(&pool->lock);
-        task.first(task.second.event, task.second.listen_fd, task.second.epoll_fd);
+  ThreadPool *pool = (ThreadPool *)arg;
+  LOG_F(INFO, "\"create thread %d\"", std::this_thread::get_id());
+  while (true) {
+    std::unique_lock<std::mutex> unique_lock(pool->m_mutex);
+
+    while (pool->m_task_queue.empty()) {
+      if (pool->m_cur_count > pool->m_min_count) {
+        pool->m_cur_count--;
+        LOG_F(INFO, "thread: %d\t No task and exit.",
+              ((unsigned)pthread_self() % 100));
+        return nullptr;
+      }
+      LOG_F(INFO, "thread: %d\tNo task go to sleep!!!",
+            ((unsigned)pthread_self() % 100));
+      pool->m_condition_variable.wait(unique_lock);
     }
+    std::pair<Task, ARG> task = pool->m_task_queue.front();
+    pool->m_task_queue.pop();
+    unique_lock.unlock();
+
+    task.first(task.second.event, task.second.listen_fd, task.second.epoll_fd);
+  }
 }
