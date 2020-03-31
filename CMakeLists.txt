@@ -7,9 +7,9 @@ include_directories(./include)
 include_directories(./src/message)
 
 
-set(SOURCE ${SOURCE} src/loguru/loguru.cpp src/yaml/yaml.cpp src/message/message.pb.cc include/server/ThreadPool/ThreadPool.h include/server/ThreadPool/ThreadPool.cpp)
+set(SOURCE ${SOURCE} src/loguru/loguru.cpp src/yaml/yaml.cpp src/message/message.pb.cc)
 
-add_executable(${PROJECT_NAME} src/server/server.cpp ${SOURCE} )
+add_executable(${PROJECT_NAME} src/server/server.cpp ${SOURCE})
 
 target_link_libraries(
         ${PROJECT_NAME}

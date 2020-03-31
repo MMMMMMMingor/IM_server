@@ -5,7 +5,6 @@
 #ifndef SESSION_HPP
 #define SESSION_HPP
 
-#include "common.hpp"
 #include "message.pb.h"
 #include "snowflake.hpp"
 #include <exception>

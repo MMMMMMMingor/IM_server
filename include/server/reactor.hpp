@@ -1,11 +1,10 @@
-#ifndef DISPATCHER_HPP
-#define DISPATCHER_HPP
+#ifndef REACTOR_HPP
+#define REACTOR_HPP
 
-#include "common.hpp"
 #include "handler.hpp"
 #include "session.hpp"
+#include "threadpool.hpp"
 #include <memory>
-#include <server/ThreadPool/ThreadPool.h>
 
 /**
  * 检测事件类型
@@ -47,27 +46,28 @@ public:
    * @param epoll_fd      epoll socket 文件描述符
    */
   bool dispatch(struct epoll_event event, int listen_fd, int epoll_fd) {
+    Context cxt{event, listen_fd, epoll_fd, m_session_pool};
     return m_thread_pool->addTask(
-        [](struct epoll_event event, int listen_fd, int epoll_fd) {
-          int socket_fd = event.data.fd;
+        [](Context cxt) {
+          int socket_fd = cxt.event.data.fd;
 
-          check_event_type(event.events);
+          check_event_type(cxt.event.events);
 
           //新用户连接
-          if (socket_fd == listen_fd) {
-            create_session_handler(listen_fd, epoll_fd);
+          if (socket_fd == cxt.listen_fd) {
+            create_session_handler(cxt);
           } else { // 业务处理
             im_message::Message message;
             message.ParseFromFileDescriptor(socket_fd);
 
             switch (message.type()) {
             case im_message::LOGIN_REQUEST:
-              client_login_handler(socket_fd, message.loginrequest());
+              client_login_handler(cxt, message);
               break;
             case im_message::LOGIN_RESPONSE:
               break;
             case im_message::LOGOUT_REQUEST:
-              client_logout_handler(socket_fd);
+              client_logout_handler(cxt);
               break;
             case im_message::LOGOUT_RESPONSE:
               break;
@@ -77,7 +77,7 @@ public:
               break;
             case im_message::MESSAGE_REQUEST:
               //处理用户发来的消息，并转发
-              transmit_message_handler(socket_fd, message.messagerequest());
+              transmit_message_handler(cxt, message.messagerequest());
               break;
             case im_message::MESSAGE_RESPONSE:
               break;
@@ -90,7 +90,7 @@ public:
             }
           }
         },
-        ARG(event, listen_fd, epoll_fd));
+        Context(cxt));
   }
 
 private:
@@ -98,4 +98,4 @@ private:
   SessionPool m_session_pool;
 };
 
-#endif
+#endif // REACTOR_HPP

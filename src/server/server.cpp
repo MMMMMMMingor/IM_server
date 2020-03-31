@@ -2,7 +2,6 @@
 #include "loguru.hpp"
 #include "server/reactor.hpp"
 #include <memory>
-#include <server/ThreadPool/ThreadPool.h>
 #include <yaml.hpp>
 
 /**

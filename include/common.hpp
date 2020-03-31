@@ -4,7 +4,6 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <iostream>
 #include <list>
 #include <map>
 #include <netinet/in.h>
@@ -17,11 +16,23 @@
 #include <unistd.h>
 #include <utility>
 
+#include "server/session.hpp"
 #include <time.h>
+
+// 上下文
+struct Context {
+  epoll_event event;
+  int listen_fd;
+  int epoll_fd;
+  SessionPool &session_pool;
+  Context(epoll_event event, int listen_fd, int epoll_fd,
+          SessionPool &session_pool)
+      : event(event), listen_fd(listen_fd),
+        epoll_fd(epoll_fd), session_pool{session_pool} {}
+};
 
 // clients_list save all the clients's socket
 std::list<int> clients_list;
-
 
 std::string getTime() {
   time_t timep;
@@ -30,15 +41,6 @@ std::string getTime() {
   strftime(tmp, sizeof(tmp), "%Y-%m-%d %H:%M:%S", localtime(&timep));
   return tmp; //自动转型
 }
-
-//// server ip
-//#define SERVER_IP "127.0.0.1"
-//
-//// server port
-//#define SERVER_PORT 9999
-//
-//// epoll size
-//#define EPOLL_SIZE 5000
 
 // message buffer size
 #define BUF_SIZE 0xFFFF
