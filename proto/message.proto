@@ -18,8 +18,8 @@ enum HeadType {
 // LoginRequest对应的HeadType为Login_Request
 // 消息名称去掉下划线，更加符合Java 的类名规范
 message LoginRequest {
-    string username = 1; // 用户唯一id
-    string password = 2; // 设备ID
+    string username = 1; // 用户名
+    string password = 2; // 密码
     string platform = 3; //客户端平台 windows、mac、android、ios、web
 }
 

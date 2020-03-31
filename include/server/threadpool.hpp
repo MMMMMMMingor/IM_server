@@ -56,7 +56,7 @@ public:
 
 private:
   // 静态函数， 非成员函数调用
-  static void *start(ThreadPool *pool) {
+  static void start(ThreadPool *pool) {
     LOG_F(INFO, "\"create thread %d\"", (unsigned)pthread_self() % 100);
     while (true) {
       std::unique_lock<std::mutex> unique_lock(pool->m_mutex);
@@ -66,7 +66,7 @@ private:
           pool->m_cur_count--;
           LOG_F(INFO, "thread: %d\t No task and exit.",
                 ((unsigned)pthread_self() % 100));
-          return nullptr;
+          return;
         }
         LOG_F(INFO, "thread: %d\tNo task and go to sleep!!!",
               ((unsigned)pthread_self() % 100));

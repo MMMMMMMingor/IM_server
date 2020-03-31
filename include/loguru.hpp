@@ -40,7 +40,7 @@
 
 #ifndef LOGURU_FILENAME_WIDTH
 // Width of the column containing the file name
-#define LOGURU_FILENAME_WIDTH 23
+#define LOGURU_FILENAME_WIDTH 30
 #endif
 
 #ifndef LOGURU_THREADNAME_WIDTH

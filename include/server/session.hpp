@@ -8,6 +8,7 @@
 #include "message.pb.h"
 #include "snowflake.hpp"
 #include <exception>
+#include <memory>
 #include <mutex>
 #include <unordered_map>
 #include <utility>
@@ -18,6 +19,7 @@
 class Session {
 public:
   Session() = default;
+  Session(const Session &rhs) = default;
   ~Session() = default;
 
   Session(int fd, std::string last_keepalive, std::string username)
@@ -58,7 +60,7 @@ public:
   template <typename Lambda> void for_each(Lambda lambda) {
     std::for_each(
         m_session_map.begin(), m_session_map.end(),
-                  [lambda](std::pair<uint64_t, Session> kv) {
+                  [lambda](std::pair<uint64_t, Session *> kv) {
                     lambda(kv.first, kv.second);
                   });
   }
@@ -78,21 +80,24 @@ public:
     std::lock_guard<std::mutex> lock_guard(m_mutex);
 
     uint64_t session_id = m_id_worker.get_next_id();
-    m_session_map.insert(std::pair<uint64_t, Session>(session_id, session));
+    m_session_map.insert(
+        std::pair<uint64_t, Session *>(session_id, new Session{session}));
     return session_id;
   }
 
   void remove_session(uint64_t session_id) {
     // 同步锁
     std::lock_guard<std::mutex> lock_guard(m_mutex);
+    Session *session = m_session_map[session_id];
     m_session_map.erase(session_id);
+    delete session;
   }
 
   void update_session(uint64_t session_id, const Session &session) {
-    m_session_map[session_id] = session;
+    m_session_map[session_id] = new Session{session};
   }
 
-  Session find_session(uint64_t session_id) {
+  Session *find_session(uint64_t session_id) {
     // 同步锁
     std::lock_guard<std::mutex> lock_guard(m_mutex);
 
@@ -100,14 +105,14 @@ public:
     if (kv != m_session_map.end()) {
       return kv->second;
     } else {
-      return kv->second;
+      return nullptr;
     }
   }
 
 private:
   IdWorker m_id_worker{1, 1};
   std::mutex m_mutex{};
-  std::unordered_map<uint64_t, Session> m_session_map{};
+  std::unordered_map<uint64_t, Session *> m_session_map{};
 };
 
 #endif // SESSION_HPP

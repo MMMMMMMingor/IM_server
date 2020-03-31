@@ -191,6 +191,7 @@ int main(int argc, char *argv[]) {
 
             im_message::Message request;
             request.set_type(im_message::HeadType::LOGOUT_REQUEST);
+            request.set_session_id(session_id);
 
             request.SerializeToFileDescriptor(client_fd);
             printf("logout\n");

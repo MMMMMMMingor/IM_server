@@ -1,7 +1,12 @@
 #ifndef REACTOR_HPP
 #define REACTOR_HPP
 
-#include "handler.hpp"
+#include "handler/client_login_handler.hpp"
+#include "handler/client_logout_handler.hpp"
+#include "handler/common_handler.hpp"
+#include "handler/create_session_handler.hpp"
+#include "handler/transmit_message_handler.hpp"
+#include "server/handler/common_handler.hpp"
 #include "session.hpp"
 #include "threadpool.hpp"
 #include <memory>
@@ -60,7 +65,16 @@ public:
             im_message::Message message;
             message.ParseFromFileDescriptor(socket_fd);
 
-            switch (message.type()) {
+            im_message::HeadType type = message.type();
+
+            // 检测是否登录，未登录。并且不是登录请求
+            if (type != im_message::LOGIN_REQUEST &&
+                !ctx.session_pool.contains(message.session_id())) {
+              notification_one(ctx, std::string{"您未登录，请先登录."});
+              return;
+            }
+
+            switch (type) {
             case im_message::LOGIN_REQUEST:
               client_login_handler(ctx, message);
               break;
