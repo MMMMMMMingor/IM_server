@@ -46,28 +46,28 @@ public:
    * @param epoll_fd      epoll socket 文件描述符
    */
   bool dispatch(struct epoll_event event, int listen_fd, int epoll_fd) {
-    Context cxt{event, listen_fd, epoll_fd, m_session_pool};
-    return m_thread_pool->addTask(
-        [](Context cxt) {
-          int socket_fd = cxt.event.data.fd;
+    Context ctx{event, listen_fd, epoll_fd, m_session_pool};
+    return m_thread_pool->add_task(
+        [](Context ctx) {
+          int socket_fd = ctx.event.data.fd;
 
-          check_event_type(cxt.event.events);
+          check_event_type(ctx.event.events);
 
           //新用户连接
-          if (socket_fd == cxt.listen_fd) {
-            create_session_handler(cxt);
+          if (socket_fd == ctx.listen_fd) {
+            create_session_handler(ctx);
           } else { // 业务处理
             im_message::Message message;
             message.ParseFromFileDescriptor(socket_fd);
 
             switch (message.type()) {
             case im_message::LOGIN_REQUEST:
-              client_login_handler(cxt, message);
+              client_login_handler(ctx, message);
               break;
             case im_message::LOGIN_RESPONSE:
               break;
             case im_message::LOGOUT_REQUEST:
-              client_logout_handler(cxt);
+              client_logout_handler(ctx, message);
               break;
             case im_message::LOGOUT_RESPONSE:
               break;
@@ -77,7 +77,7 @@ public:
               break;
             case im_message::MESSAGE_REQUEST:
               //处理用户发来的消息，并转发
-              transmit_message_handler(cxt, message.messagerequest());
+              transmit_message_handler(ctx, message);
               break;
             case im_message::MESSAGE_RESPONSE:
               break;
@@ -90,7 +90,7 @@ public:
             }
           }
         },
-        Context(cxt));
+        ctx);
   }
 
 private:

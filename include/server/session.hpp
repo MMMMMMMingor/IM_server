@@ -28,7 +28,7 @@ public:
 
   std::string get_last_keepalive() { return m_last_keepalive; }
 
-  std::string get_username() { return m_username; }
+  const std::string &get_username() { return m_username; }
 
   void set_socket_fd(int socket_fd) { m_socket_fd = socket_fd; }
 
@@ -49,19 +49,29 @@ private:
  */
 class SessionPool {
 public:
-  using func = void (*)(uint64_t, Session);
+  //  using Lambda = void (*)(uint64_t, Session);
 
 public:
   SessionPool() = default;
   ~SessionPool() = default;
 
-  void for_each(func f) {
+  template <typename Lambda> void for_each(Lambda lambda) {
     std::for_each(
         m_session_map.begin(), m_session_map.end(),
-        [f](std::pair<uint64_t, Session> kv) { f(kv.first, kv.second); });
+                  [lambda](std::pair<uint64_t, Session> kv) {
+                    lambda(kv.first, kv.second);
+                  });
   }
 
-  uint32_t get_count() { return m_session_map.size(); }
+  bool contains(uint64_t session_id) {
+    // 同步锁
+    std::lock_guard<std::mutex> lock_guard(m_mutex);
+
+    auto kv = m_session_map.find(session_id);
+    return kv != m_session_map.end();
+  }
+
+  uint32_t get_current_count() { return m_session_map.size(); }
 
   uint64_t add_session(const Session &session) {
     // 同步锁

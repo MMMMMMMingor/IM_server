@@ -7,9 +7,6 @@
 #include <list>
 #include <map>
 #include <netinet/in.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -32,7 +29,7 @@ struct Context {
 };
 
 // clients_list save all the clients's socket
-std::list<int> clients_list;
+// std::list<int> clients_list;
 
 std::string getTime() {
   time_t timep;

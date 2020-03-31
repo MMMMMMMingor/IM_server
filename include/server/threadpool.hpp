@@ -31,7 +31,8 @@ public:
 
   ~ThreadPool() { LOG_F(INFO, "ThreadPool is destroyed!!"); }
 
-  bool addTask(Task task, Context cxt) {
+  //  template <typename Task>
+  bool add_task(Task task, Context cxt) {
     // 首先先获取锁
     std::lock_guard<std::mutex> lock_guard(m_mutex);
 

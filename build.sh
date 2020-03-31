@@ -1,9 +1,3 @@
-###
- # @Author: Firefly
- # @Date: 2020-03-30 15:06:50
- # @Descripttion: 
- # @LastEditTime: 2020-03-30 15:18:27
- ###
 #!/usr/bin/env bash
 
 mkdir src/message

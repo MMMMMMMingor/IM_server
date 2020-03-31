@@ -18,19 +18,19 @@
  */
 class Server {
 private:
-  int listener;
-  int epfd;
+  int listener{};
+  int epfd{};
   struct sockaddr_in serverAddr {};
-  struct epoll_event *events;
+  struct epoll_event *events{};
   std::string SERVER_IP;
-  uint16_t SERVER_PORT;
-  int EPOLL_SIZE;
+  uint16_t SERVER_PORT{};
+  int EPOLL_SIZE{};
 
-  int THREAD_MIN_NUM;
-  int THREAD_MAX_NUM;
-  int THREAD_QUEUE_SIZE;
+  int THREAD_MIN_NUM{};
+  int THREAD_MAX_NUM{};
+  int THREAD_QUEUE_SIZE{};
 
-  Reactor *reactor;
+  Reactor *reactor{};
 
 public:
   Server() { init(); }
@@ -128,7 +128,7 @@ public:
       for (int i = 0; i < epoll_events_count; ++i) {
         // 事件分配器到线程池
         while (!(reactor->dispatch(events[i], listener, epfd))) {
-          LOG_F(INFO, "服务器宕机了");
+          LOG_F(INFO, "任务队列已满，服务器宕机了");
           sleep(10);
         }
         // dispatcher(events[i], listener, epfd);

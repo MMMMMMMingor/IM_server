@@ -6,6 +6,7 @@
 
 static std::string username;
 static std::string password;
+static uint64_t session_id;
 static std::string SERVER_IP;
 static uint16_t SERVER_PORT;
 
@@ -158,6 +159,7 @@ int main(int argc, char *argv[]) {
           case im_message::LOGIN_REQUEST:
             break;
           case im_message::LOGIN_RESPONSE:
+            session_id = response.session_id();
             printf("%s\n", response.loginresponse().info().c_str());
             break;
           case im_message::LOGOUT_REQUEST:
@@ -196,6 +198,7 @@ int main(int argc, char *argv[]) {
           }
           im_message::Message request;
           request.set_type(im_message::HeadType::MESSAGE_REQUEST);
+          request.set_session_id(session_id);
           auto *message_request = new im_message::MessageRequest{};
           message_request->set_content(message);
           request.set_allocated_messagerequest(message_request);
