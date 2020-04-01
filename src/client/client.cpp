@@ -47,7 +47,7 @@ void login(const int client_fd) {
  * 心跳响应
  * @param socket_fd
  */
-void keepalive_response(int socket_fd) {
+void keepalive_response(uint64_t socket_fd) {
   im_message::Message response;
   response.set_session_id(session_id);
   response.set_type(im_message::HeadType::KEEPALIVE_RESPONSE);
@@ -183,6 +183,7 @@ int main(int argc, char *argv[]) {
             break;
           case im_message::LOGOUT_RESPONSE: {
             isClientwork = false;
+            printf("登出成功\n");
             break;
           }
           case im_message::KEEPALIVE_REQUEST: {
@@ -215,7 +216,6 @@ int main(int argc, char *argv[]) {
             request.set_session_id(session_id);
 
             request.SerializeToFileDescriptor(client_fd);
-            printf("登出成功\n");
             continue;
           }
           im_message::Message request;

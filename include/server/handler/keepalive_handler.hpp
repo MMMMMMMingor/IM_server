@@ -9,7 +9,7 @@
  * @param message   消息
  */
 void keepalive_handler(Context &ctx, const im_message::Message &message) {
-  int session_id = message.session_id();
+  uint64_t session_id = message.session_id();
   std::string username =
       ctx.session_pool.find_session(session_id)->get_username();
   LOG_F(INFO, "收到来自  %s  的心跳包", username.c_str());
