@@ -35,6 +35,7 @@ void notification_all(Context &ctx, const std::string &message) {
   im_message::Message response;
   response.set_type(im_message::HeadType::MESSAGE_NOTIFICATION);
   auto *message_notification = new im_message::MessageNotification;
+  // 在哪里 del？？？？？？？？？？？？？？？？？？？
   message_notification->set_json(message);
   message_notification->set_timestamp(getTime());
   response.set_allocated_notification(message_notification);

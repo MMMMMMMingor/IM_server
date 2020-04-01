@@ -1,5 +1,8 @@
 #ifndef CLIENT_LOGIN_HANDLER_HPP
 #define CLIENT_LOGIN_HANDLER_HPP
+
+#include "common_handler.hpp"
+
 /**
  * 用户登录
  * @param Context       上下文
