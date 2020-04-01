@@ -30,6 +30,7 @@ public:
       }
     };
     std::thread t{func};
+
     t.detach();
   }
 

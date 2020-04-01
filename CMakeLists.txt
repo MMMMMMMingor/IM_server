@@ -36,7 +36,7 @@ target_link_libraries(
 ############### 测试 ###############
 enable_testing()
 
-add_executable(test_add test/test_add.cpp)
+add_executable(test_add test/test_add.cpp test/test_history.cpp)
 add_test(NAME test_add COMMAND test_add 1 2)
 SET_TESTS_PROPERTIES(test_add
         PROPERTIES PASS_REGULAR_EXPRESSION "3")
@@ -52,3 +52,9 @@ add_executable(test_snowflake test/test_snowflake.cpp)
 add_executable(test_session test/test_session.cpp)
 
 add_executable(test_keepalive test/test_keepalive.cpp)
+
+add_executable(test_history test/test_history.cpp ../src/message/message.pb.cc )
+target_link_libraries(
+        test_history
+        protobuf
+)

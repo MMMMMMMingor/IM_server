@@ -15,6 +15,10 @@
 
 #include "server/session.hpp"
 #include <time.h>
+#include <server/histroy_message.hpp>
+
+//// 作为全局变量， 不在server了
+history_message *history_msg = new history_message(10);
 
 // 上下文
 struct Context {

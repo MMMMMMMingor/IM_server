@@ -1,52 +1,60 @@
 
+#include "common.hpp"
+#include "loguru.hpp"
+#include <loguru.hpp>
+
 // 存储全局的消息， 最多存储 n 条
-class message {
+class history_message {
 private:
     // 支持存储的最大消息
     int maxLen;
     // 当前的存储位置
     int index;
-    //最晚的消息编号
-    int lastId;
+    // 全局的 消息id
+    int id;
     bool save2file;
-    vector <im_message::Message> msg;
-    vector<int> msg_id;
+    std::vector<im_message::Message> msg;
 
-    message() {
-        message(1000);// 默认 1000条
+public:
+    history_message() {
+        history_message(1000);// 默认 1000条
     }
 
-    message(int maxLen) {
+    history_message(int maxLen) {
         index = 0;
         this->maxLen = maxLen;
         save2file = false;
+        id = 0;
     }
 
-public:
-    void add_one(im_message::Message msg, int id) {//消息的全局编号
 
-        if (msg.size() < maxLen) {
+    void add_one(im_message::Message msg) {//消息的全局编号
+
+        if (this->msg.size() < maxLen) {
             this->msg.push_back(msg);
-            this->msg_id.push_back(id);
         } else {
             if (index >= maxLen) index = 0;
             this->msg[index] = msg;
-            this->msg_id[index] = id;
             //! 会不会内存泄漏？  原来的string 对象去哪里了？
             index++;
         }
-        if (save2file) save2file();
+        this->id++;
+        if (save2file) save("lalala");
+//        LOG_F(INFO,"test history_message");
+    }
+    int get_id(){
+        return  this->id;
     }
 
-    vector <pair<im_message::Message, int>> get_all() {
-        vector <pair<im_message::Message, int>> ret;
+    std::vector<im_message::Message> get_all() {
+        std::vector<im_message::Message> ret;
         if (this->msg.size() < maxLen) {
-            for (int i = 0; i < msg.size(); i++) ret.push_back(make_pair(msg[i], msg_id[i]));
+            for (const auto & i : msg) ret.push_back(i);
         } else {
             int in = index + 1;
-            while (in < maxLen) ret.push_back(make_pair(msg[in], msg_id[in++]));
+            while (in < maxLen) ret.push_back(msg[in++]);
             in = 0;
-            while (in <= index) ret.push_back(make_pair(msg[in], msg_id[in++]));
+            while (in <= index) ret.push_back(msg[in++]);
         }
         return ret;
     }
@@ -56,8 +64,9 @@ public:
 
     }
 
-    bool save2file(string msg) {
+    bool save(std::string msg) {
         // 保存到文件？？？
+        return false;
     }
 
 
