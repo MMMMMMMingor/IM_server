@@ -7,3 +7,6 @@ server:
     min: 4
     max: 8
     queueSize: 1000
+  keepalive:
+    check_interval: 1
+    invalid_interval: 10

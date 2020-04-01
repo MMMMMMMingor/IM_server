@@ -10,7 +10,7 @@ void create_session_handler(Context ctx) {
   int client_fd = accept(ctx.listen_fd, (struct sockaddr *)&client_address,
                          &client_addrLength);
 
-  LOG_F(INFO, "client connection from: %s : % d(IP : port), client_fd = %d ",
+  LOG_F(INFO, "用户连接: %s : % d(IP : port), client_fd = %d ",
         inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port),
         client_fd);
 

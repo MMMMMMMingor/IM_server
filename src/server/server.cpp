@@ -29,6 +29,8 @@ private:
   int THREAD_MIN_NUM{};
   int THREAD_MAX_NUM{};
   int THREAD_QUEUE_SIZE{};
+  int KEEPALIVE_CHECK_INTERVAL{};
+  int KEEPALIVE_INVALID_INTERVAL{};
 
   Reactor *reactor{};
 
@@ -42,13 +44,15 @@ public:
   }
 
   void init() {
-    configuration(); //一定要放到前面
-    init_reactor();
+    configuration(); //顺序不可更改
     init_epoll();
+    init_reactor();
   }
 
   void init_reactor() {
-    reactor = new Reactor(THREAD_MIN_NUM, THREAD_MAX_NUM, THREAD_QUEUE_SIZE);
+    reactor = new Reactor(THREAD_MIN_NUM, THREAD_MAX_NUM, THREAD_QUEUE_SIZE,
+                          KEEPALIVE_CHECK_INTERVAL, KEEPALIVE_INVALID_INTERVAL);
+    reactor->init();
   }
 
   void init_epoll() {
@@ -111,9 +115,11 @@ public:
     this->THREAD_MAX_NUM = root["server"]["threadPool"]["max"].As<int>();
     this->THREAD_QUEUE_SIZE =
         root["server"]["threadPool"]["queueSize"].As<int>();
+    this->KEEPALIVE_CHECK_INTERVAL =
+        root["server"]["keepalive"]["check_interval"].As<int>();
+    this->KEEPALIVE_INVALID_INTERVAL =
+        root["server"]["keepalive"]["invalid_interval"].As<int>();
   }
-
-
 
   void start() {
     while (true) {

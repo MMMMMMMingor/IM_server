@@ -5,7 +5,9 @@
 #include "handler/client_logout_handler.hpp"
 #include "handler/common_handler.hpp"
 #include "handler/create_session_handler.hpp"
+#include "handler/keepalive_handler.hpp"
 #include "handler/transmit_message_handler.hpp"
+#include "keepalive.hpp"
 #include "server/handler/common_handler.hpp"
 #include "session.hpp"
 #include "threadpool.hpp"
@@ -39,10 +41,19 @@ inline void check_event_type(uint32_t type) {
 class Reactor {
 
 public:
-  Reactor(int min, int max, int size)
-      : m_thread_pool(new ThreadPool(min, max, size)), m_session_pool{} {}
+  Reactor(int min, int max, int size, int check, int invalid)
+      : m_thread_pool(new ThreadPool(min, max, size)), m_session_pool{},
+        m_keep_alive{new KeepAlive{check, invalid}} {}
 
-  ~Reactor() { delete m_thread_pool; }
+  ~Reactor() {
+    delete m_thread_pool;
+    delete m_keep_alive;
+  }
+
+  /**
+   * 初始化 Reactor
+   */
+  void init() { m_keep_alive->init(&m_session_pool); }
 
   /**
    * 事件分配器
@@ -88,6 +99,7 @@ public:
             case im_message::KEEPALIVE_REQUEST:
               break;
             case im_message::KEEPALIVE_RESPONSE:
+              keepalive_handler(ctx, message);
               break;
             case im_message::MESSAGE_REQUEST:
               //处理用户发来的消息，并转发
@@ -110,6 +122,7 @@ public:
 private:
   ThreadPool *m_thread_pool;
   SessionPool m_session_pool;
+  KeepAlive *m_keep_alive;
 };
 
 #endif // REACTOR_HPP

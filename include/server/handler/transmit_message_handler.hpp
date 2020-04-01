@@ -6,7 +6,8 @@
  * @param Context       上下文
  * @param message       消息
  */
-void transmit_message_handler(Context ctx, const im_message::Message &message) {
+void transmit_message_handler(Context &ctx,
+                              const im_message::Message &message) {
 
   int client_fd = ctx.event.data.fd;
 

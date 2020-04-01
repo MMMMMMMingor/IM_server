@@ -12,7 +12,6 @@ void client_logout_handler(Context ctx, const im_message::Message &message) {
   response.set_type(im_message::HeadType::LOGOUT_RESPONSE);
   response.SerializeToFileDescriptor(client_fd);
 
-  close(client_fd);
   ctx.session_pool.remove_session(message.session_id());
 
   std::string notice{"用户xxx下线"};

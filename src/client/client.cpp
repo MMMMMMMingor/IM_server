@@ -1,12 +1,14 @@
 #include "common.hpp"
 #include "message.pb.h"
+#include <chrono>
 #include <iostream>
 #include <string>
+#include <thread>
 #include <yaml.hpp>
 
 static std::string username;
 static std::string password;
-static uint64_t session_id;
+static uint64_t session_id{0};
 static std::string SERVER_IP;
 static uint16_t SERVER_PORT;
 
@@ -39,6 +41,17 @@ void login(const int client_fd) {
   login_request->set_password(password);
   request.set_allocated_loginrequest(login_request);
   request.SerializeToFileDescriptor(client_fd);
+}
+
+/**
+ * 心跳响应
+ * @param socket_fd
+ */
+void keepalive_response(int socket_fd) {
+  im_message::Message response;
+  response.set_session_id(session_id);
+  response.set_type(im_message::HeadType::KEEPALIVE_RESPONSE);
+  response.SerializeToFileDescriptor(socket_fd);
 }
 
 int main(int argc, char *argv[]) {
@@ -151,31 +164,39 @@ int main(int argc, char *argv[]) {
           switch (response.type()) {
           case im_message::HeadType::MESSAGE_RESPONSE: {
             printf("%s\n", response.messageresponse().info().c_str());
+            break;
           }
           case im_message::HeadType::MESSAGE_NOTIFICATION: {
             printf("%s %s\n", response.notification().timestamp().c_str(),
                    response.notification().json().c_str());
+            break;
           }
           case im_message::LOGIN_REQUEST:
             break;
-          case im_message::LOGIN_RESPONSE:
+          case im_message::LOGIN_RESPONSE: {
             session_id = response.session_id();
+            printf("%s\n", "-------------登陆成功-------------");
             printf("%s\n", response.loginresponse().info().c_str());
             break;
+          }
           case im_message::LOGOUT_REQUEST:
             break;
           case im_message::LOGOUT_RESPONSE: {
             isClientwork = false;
             break;
           }
-          case im_message::KEEPALIVE_REQUEST:
+          case im_message::KEEPALIVE_REQUEST: {
+            printf("%s \n", "成功接收到来自服务器的心跳包");
+            keepalive_response(client_fd);
             break;
+          }
           case im_message::KEEPALIVE_RESPONSE:
             break;
-          case im_message::MESSAGE_REQUEST:
+          case im_message::MESSAGE_REQUEST: {
             printf("%s -> %s\n", response.messagerequest().from_nick().c_str(),
                    response.messagerequest().content().c_str());
             break;
+          }
           case im_message::HeadType_INT_MIN_SENTINEL_DO_NOT_USE_:
             break;
           case im_message::HeadType_INT_MAX_SENTINEL_DO_NOT_USE_:
@@ -194,7 +215,7 @@ int main(int argc, char *argv[]) {
             request.set_session_id(session_id);
 
             request.SerializeToFileDescriptor(client_fd);
-            printf("logout\n");
+            printf("登出成功\n");
             continue;
           }
           im_message::Message request;

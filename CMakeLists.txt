@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 
 project(IM_server)
-add_definitions(-std=c++11)
+add_compile_options(-std=c++11)
+#add_compile_options(-O3)
 
 include_directories(./include)
 include_directories(./src/message)
@@ -48,3 +49,5 @@ SET_TESTS_PROPERTIES(test_yaml
 add_executable(test_snowflake test/test_snowflake.cpp)
 
 add_executable(test_session test/test_session.cpp)
+
+add_executable(test_keepalive test/test_keepalive.cpp)

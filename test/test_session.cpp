@@ -2,41 +2,64 @@
 // Created by Mingor on 2020/3/30.
 //
 #include "common.hpp"
+#include <chrono>
 #include <iostream>
-#include <server/session.hpp>
+#include <ratio>
+
+using namespace std;
+
+inline int distance(Session::Time time) {
+  return chrono::duration_cast<chrono::seconds>(
+             (chrono::system_clock::now() - time))
+      .count();
+}
+
+inline void print(Session *session) {
+  cout << session->get_socket_fd() << "\n"
+       << session->get_username() << "\n"
+       << distance(session->get_last_keepalive()) << "\n------------------\n";
+}
 
 int main(int argc, char *argv[]) {
 
   SessionPool session_pool;
 
-  Session session{5, getTime(), "mingor"};
+  Session *session = new Session{5, chrono::system_clock::now(), "mingor"};
   uint64_t session_id = session_pool.add_session(session);
-
-  Session *session2 = session_pool.find_session(session_id);
-  std::cout << session.get_socket_fd() << session.get_username()
-            << session.get_last_keepalive() << std::endl;
-
-  Session session3{10, getTime(), "firefly"};
-  session_pool.update_session(session_id, session3);
-
-  Session *session4 = session_pool.find_session(session_id);
-  std::cout << session4->get_socket_fd() << session4->get_username()
-            << session4->get_last_keepalive() << std::endl;
+  session_pool.add_session(session);
+  session_pool.add_session(session);
+  session_pool.add_session(session);
+  //
+  //  Session *session2 = session_pool.find_session(session_id);
+  //  print(session2);
+  //
+  //  Session session3{10, chrono::system_clock::now(), "firefly"};
+  //  session_pool.update_session(session_id, session3);
+  //
+  //  Session *session4 = session_pool.find_session(session_id);
+  //  print(session4);
+  //
 
   //  session_pool.remove_session(session_id);
 
-  if (Session *session5 = session_pool.find_session(session_id))
-    std::cout << session5->get_socket_fd() << session5->get_username()
-              << session5->get_last_keepalive() << std::endl;
+  //  if (Session *session5 = session_pool.find_session(session_id))
+  //    print(session5);
 
-  session_pool.for_each([](uint64_t id, Session *session) {
-    std::cout << id << session->get_socket_fd() << session->get_username()
-              << session->get_last_keepalive() << std::endl;
-  });
+  cout << session_pool.get_current_count() << endl;
 
-  std::cout << session_pool.contains(session_id) << std::endl;
+  session_pool.for_each(
+      [session_id, &session_pool](uint64_t id, Session *session) {
+        std::cout << id << "\n";
+        if (id == session_id) {
+          session_pool.remove_session(session_id);
+        }
+      });
 
-  std::cout << session_pool.contains(0) << std::endl;
+  cout << session_pool.get_current_count() << endl;
+
+  //  cout << session_pool.contains(session_id) << endl;
+  //
+  //  cout << session_pool.contains(0) << endl;
 
   return 0;
 }

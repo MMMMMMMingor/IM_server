@@ -7,6 +7,7 @@
 
 #include "message.pb.h"
 #include "snowflake.hpp"
+#include <chrono>
 #include <exception>
 #include <memory>
 #include <mutex>
@@ -18,31 +19,34 @@
  */
 class Session {
 public:
+  using Time = decltype(std::chrono::system_clock::now());
+
+public:
   Session() = default;
   Session(const Session &rhs) = default;
   ~Session() = default;
 
-  Session(int fd, std::string last_keepalive, std::string username)
-      : m_socket_fd(fd), m_last_keepalive(std::move(last_keepalive)),
+  Session(int fd, Time last_keepalive, std::string username)
+      : m_socket_fd(fd), m_last_keepalive(last_keepalive),
         m_username(std::move(username)) {}
 
   int get_socket_fd() { return m_socket_fd; }
 
-  std::string get_last_keepalive() { return m_last_keepalive; }
+  Time get_last_keepalive() { return m_last_keepalive; }
 
   const std::string &get_username() { return m_username; }
 
   void set_socket_fd(int socket_fd) { m_socket_fd = socket_fd; }
 
-  void set_last_keepalive(std::string last_keepalive) {
-    m_last_keepalive = std::move(last_keepalive);
+  void set_last_keepalive(Time last_keepalive) {
+    m_last_keepalive = last_keepalive;
   }
 
   void set_username(std::string username) { m_username = std::move(username); }
 
 private:
   int m_socket_fd{};
-  std::string m_last_keepalive;
+  Time m_last_keepalive;
   std::string m_username;
 };
 
@@ -58,8 +62,9 @@ public:
   ~SessionPool() = default;
 
   template <typename Lambda> void for_each(Lambda lambda) {
-    std::for_each(
-        m_session_map.begin(), m_session_map.end(),
+    std::lock_guard<std::mutex> lock_guard(m_mutex);
+
+    std::for_each(m_session_map.begin(), m_session_map.end(),
                   [lambda](std::pair<uint64_t, Session *> kv) {
                     lambda(kv.first, kv.second);
                   });
@@ -75,13 +80,12 @@ public:
 
   uint32_t get_current_count() { return m_session_map.size(); }
 
-  uint64_t add_session(const Session &session) {
+  uint64_t add_session(Session *session) {
     // 同步锁
     std::lock_guard<std::mutex> lock_guard(m_mutex);
 
     uint64_t session_id = m_id_worker.get_next_id();
-    m_session_map.insert(
-        std::pair<uint64_t, Session *>(session_id, new Session{session}));
+    m_session_map.insert(std::pair<uint64_t, Session *>(session_id, session));
     return session_id;
   }
 
@@ -89,6 +93,7 @@ public:
     // 同步锁
     std::lock_guard<std::mutex> lock_guard(m_mutex);
     Session *session = m_session_map[session_id];
+    close(session->get_socket_fd());
     m_session_map.erase(session_id);
     delete session;
   }
