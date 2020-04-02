@@ -43,7 +43,9 @@ class Reactor {
 public:
     Reactor(int min, int max, int size, int check, int invalid)
             : m_thread_pool(new ThreadPool(min, max, size)), m_session_pool{},
-              m_keep_alive{new KeepAlive{check, invalid}} {}
+              m_keep_alive{new KeepAlive{check, invalid}} {
+
+    }
 
     ~Reactor() {
         delete m_thread_pool;
@@ -62,7 +64,7 @@ public:
      * @param epoll_fd      epoll socket 文件描述符
      */
     bool dispatch(struct epoll_event event, int listen_fd, int epoll_fd) {
-        Context ctx{event, listen_fd, epoll_fd, m_session_pool};
+        Context ctx{event, listen_fd, epoll_fd, m_session_pool, msgs};
         return m_thread_pool->add_task(
                 [](Context ctx) {
                     int socket_fd = ctx.event.data.fd;
@@ -77,7 +79,7 @@ public:
                         message.ParseFromFileDescriptor(socket_fd);
 
                         // 添加 到 历史的消息里面， 内部维持计数， 如果要获取历史消息，可以给一个序号
-                        history_msg->add_one(message);
+                        //history_msg->add_one(message);
 
                         im_message::HeadType type = message.type();
 
@@ -126,6 +128,7 @@ private:
     ThreadPool *m_thread_pool;
     SessionPool m_session_pool;
     KeepAlive *m_keep_alive;
+    std::unordered_map<std::string, history_message *> msgs;
 };
 
 #endif // REACTOR_HPP

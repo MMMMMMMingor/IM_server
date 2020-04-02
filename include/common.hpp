@@ -1,3 +1,9 @@
+/*
+ * @Author: Firefly
+ * @Date: 2020-03-31 21:42:07
+ * @Descripttion: 
+ * @LastEditTime: 2020-04-01 23:36:44
+ */
 #ifndef COMMON_HPP
 #define COMMON_HPP
 
@@ -18,29 +24,32 @@
 #include <server/histroy_message.hpp>
 
 //// 作为全局变量， 不在server了
-history_message *history_msg = new history_message(10);
+//history_message *history_msg = new history_message(1000);
+
+using msgs_map = std::unordered_map<std::string, history_message *>;
 
 // 上下文
 struct Context {
-  epoll_event event;
-  int listen_fd;
-  int epoll_fd;
-  SessionPool &session_pool;
-  Context(epoll_event event, int listen_fd, int epoll_fd,
-          SessionPool &session_pool)
-      : event(event), listen_fd(listen_fd),
-        epoll_fd(epoll_fd), session_pool{session_pool} {}
+    epoll_event event;
+    int listen_fd;
+    int epoll_fd;
+    SessionPool &session_pool;
+    msgs_map &msg_map;
+//  Context(epoll_event event, int listen_fd, int epoll_fd,
+//          SessionPool &session_pool)
+//      : event(event), listen_fd(listen_fd),
+//        epoll_fd(epoll_fd), session_pool{session_pool} {}
 };
 
 // clients_list save all the clients's socket
 // std::list<int> clients_list;
 
 std::string getTime() {
-  time_t timep;
-  time(&timep);
-  char tmp[64];
-  strftime(tmp, sizeof(tmp), "%Y-%m-%d %H:%M:%S", localtime(&timep));
-  return tmp; //自动转型
+    time_t timep;
+    time(&timep);
+    char tmp[64];
+    strftime(tmp, sizeof(tmp), "%Y-%m-%d %H:%M:%S", localtime(&timep));
+    return tmp; //自动转型
 }
 
 // message buffer size
@@ -58,8 +67,8 @@ std::string getTime() {
  *设置非阻塞
  */
 int setNonblock(int sockfd) {
-  fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFD, 0) | O_NONBLOCK);
-  return 0;
+    fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFD, 0) | O_NONBLOCK);
+    return 0;
 }
 
 /**
@@ -67,8 +76,8 @@ int setNonblock(int sockfd) {
  * @param msg 错误信息
  */
 void error(const char *msg) {
-  perror(msg);
-  exit(EXIT_FAILURE);
+    perror(msg);
+    exit(EXIT_FAILURE);
 }
 
 /**
@@ -83,14 +92,14 @@ void error(const char *msg) {
  */
 
 void add_fd(int epollfd, int fd, bool enable_et) {
-  struct epoll_event ev {};
-  ev.data.fd = fd;
-  ev.events = EPOLLIN;
-  if (enable_et) {
-    ev.events = EPOLLIN | EPOLLET;
-  }
-  epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &ev);
-  setNonblock(fd);
+    struct epoll_event ev{};
+    ev.data.fd = fd;
+    ev.events = EPOLLIN;
+    if (enable_et) {
+        ev.events = EPOLLIN | EPOLLET;
+    }
+    epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &ev);
+    setNonblock(fd);
 }
 
 #endif // COMMON_HPP

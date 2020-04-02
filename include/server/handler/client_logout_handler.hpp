@@ -20,6 +20,7 @@ void client_logout_handler(Context ctx, const im_message::Message &message) {
 
   LOG_F(INFO, "ClientID = %d closed. now there are %d client in the char room",
         client_fd, ctx.session_pool.get_current_count());
+        
 }
 
 #endif
