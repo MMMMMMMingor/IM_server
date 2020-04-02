@@ -23,20 +23,24 @@ class ThreadPool {
 public:
   //构造函数,确定线程池的线程数
   ThreadPool(size_t min, size_t max, size_t size)
-      : m_mutex{}, m_condition_variable{}, m_cur_count{0}, m_min_count{min},
-        m_max_count{max}, m_max_queue_size{size} {
+      : m_min_count{min}, m_max_count{max}, m_max_queue_size{size} {
 
     LOG_F(INFO, "main pthread pid is %d", (unsigned)pthread_self() % 100);
   }
 
-  ~ThreadPool() { LOG_F(INFO, "ThreadPool is destroyed!!"); }
+  ~ThreadPool() {
+    *m_finished = true;
+    LOG_F(INFO, "ThreadPool is destroyed!!");
+  }
 
   //  template <typename Task>
   bool add_task(Task task, Context cxt) {
     // 首先先获取锁
     std::lock_guard<std::mutex> lock_guard(m_mutex);
 
-    if (m_cur_count < m_max_count) {
+    this->m_task_queue.push(std::make_pair(task, cxt));
+
+    if (m_cur_count < m_task_queue.size() && m_cur_count < m_max_count) {
       m_cur_count++;
       std::thread t(ThreadPool::start, this);
       t.detach();
@@ -47,7 +51,6 @@ public:
       return false; // 返回错误
     }
 
-    this->m_task_queue.push(std::make_pair(task, cxt));
 
     m_condition_variable.notify_one();
 
@@ -57,8 +60,8 @@ public:
 private:
   // 静态函数， 非成员函数调用
   static void start(ThreadPool *pool) {
-    LOG_F(INFO, "\"create thread %d\"", (unsigned)pthread_self() % 100);
-    while (true) {
+    LOG_F(INFO, "\"create thread %d\"", (unsigned)pthread_self());
+    while (!*(pool->m_finished)) {
       std::unique_lock<std::mutex> unique_lock(pool->m_mutex);
 
       while (pool->m_task_queue.empty()) {
@@ -81,20 +84,22 @@ private:
   }
 
 private:
+  // 是否结束
+  bool *m_finished = new bool{false};
   //定义任务队列
   std::queue<std::pair<Task, Context>> m_task_queue;
-  //最大线程数量
-  size_t m_max_count;
   //最小线程数量
-  size_t m_min_count;
+  const size_t m_min_count;
+  //最大线程数量
+  const size_t m_max_count;
   //当前线程数量
-  volatile size_t m_cur_count;
+  volatile size_t m_cur_count{0};
   //最大任务数量
   size_t m_max_queue_size;
   //条件变量
-  std::condition_variable m_condition_variable;
+  std::condition_variable m_condition_variable{};
   //互斥量
-  std::mutex m_mutex;
+  std::mutex m_mutex{};
 };
 
 #endif // THREAD_POOL_HPP
