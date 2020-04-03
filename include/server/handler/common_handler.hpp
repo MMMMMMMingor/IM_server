@@ -1,3 +1,9 @@
+/*
+ * @Author: Firefly
+ * @Date: 2020-03-31 23:48:24
+ * @Descripttion: 
+ * @LastEditTime: 2020-04-02 12:33:54
+ */
 #ifndef HANDLER_HPP
 #define HANDLER_HPP
 
@@ -17,14 +23,16 @@ void board_cast_message(Context &ctx, const im_message::Message &message) {
     bool success = message.SerializeToFileDescriptor(session->get_socket_fd());
 
     if (!success) {
+      
       LOG_F(ERROR, "board cast error");
+      
       //      exit(EXIT_FAILURE);
     }
   };
   LOG_F(INFO, "--------------board_cast_message-------------------");
 
   ctx.session_pool.for_each(lambda);
-}
+} 
 
 /**
  * 通知所有用户
