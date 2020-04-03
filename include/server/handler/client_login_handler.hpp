@@ -17,10 +17,11 @@ void client_login_handler(Context ctx, const im_message::Message &message) {
     const std::string &pwd = login_request.password();
 
     // 添加索引
-    if (ctx.msg_map.find(pwd) == ctx.msg_map.end()){
+    if (ctx.msg_map.find(pwd) == ctx.msg_map.end()) {
         ctx.msg_map[pwd] = new history_message();
     }
 
+    //! 没有考虑， 同名的情况， 之后加一个同名的判断
 
 
     // 添加session
@@ -55,9 +56,12 @@ void client_login_handler(Context ctx, const im_message::Message &message) {
 
     bool success = response.SerializeToFileDescriptor(client_fd);
 
-    //  std::string login_notification = login_request.username();
-    //  login_notification += " 登录";
-    //  notification_all(ctx, login_notification);
+    std::string login_notification = login_request.username();
+    login_notification += " 登录";
+
+    // pwd 作为 room id
+    notification_by_room_id(ctx, login_notification, pwd);
+
 
     if (!success) {
         LOG_F(ERROR, "send error");
@@ -65,9 +69,8 @@ void client_login_handler(Context ctx, const im_message::Message &message) {
     }
 
 
-    // 添加消息, Message 类型存储不了  info ？？？？？？
+    // 添加消息, Message 类型只存储了 名字和房间号， 提示信息还要封装
     ctx.msg_map[pwd]->add_one(response);
-
 
 
 }

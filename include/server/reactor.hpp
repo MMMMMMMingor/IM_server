@@ -78,9 +78,6 @@ public:
                         im_message::Message message;
                         message.ParseFromFileDescriptor(socket_fd);
 
-                        // 添加 到 历史的消息里面， 内部维持计数， 如果要获取历史消息，可以给一个序号
-                        //history_msg->add_one(message);
-
                         im_message::HeadType type = message.type();
 
                         // 检测是否登录，未登录。并且不是登录请求
