@@ -11,6 +11,7 @@
 #include "message.pb.h"
 #include "server/session.hpp"
 #include <string>
+#include <utility>
 
 /**
  * 广播消息
@@ -32,7 +33,42 @@ void board_cast_message(Context &ctx, const im_message::Message &message) {
   LOG_F(INFO, "--------------board_cast_message-------------------");
 
   ctx.session_pool.for_each(lambda);
-} 
+}
+
+void board_cast_message_by_room_id(Context &ctx, const im_message::Message &message,std::string room_id) {
+
+    auto lambda = [&message,&room_id](uint64_t session_id, Session *session) {
+        if(room_id != session->get_room_name()) return; // 相同的 roomid 才执行发送
+        bool success = message.SerializeToFileDescriptor(session->get_socket_fd());
+        if (!success) {
+
+            LOG_F(ERROR, "board cast error");
+
+            //      exit(EXIT_FAILURE);
+        }
+    };
+    LOG_F(INFO, "--------------board_cast_message_by_room_id-------------------");
+
+    ctx.session_pool.for_each(lambda);
+}
+
+/**
+ * 通知某一个房间的所有用户
+ * @param ctx
+ * @param message
+ */
+void notification_by_room_id(Context &ctx, const std::string &message,std::string room_id) {
+    im_message::Message response;
+    response.set_type(im_message::HeadType::MESSAGE_NOTIFICATION);
+    auto *message_notification = new im_message::MessageNotification;
+
+    message_notification->set_json(message);
+    message_notification->set_timestamp(getTime());
+    response.set_allocated_notification(message_notification);
+
+    board_cast_message_by_room_id(ctx, response,std::move(room_id));
+}
+
 
 /**
  * 通知所有用户

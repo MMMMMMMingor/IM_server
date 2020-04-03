@@ -45,7 +45,7 @@ public:
     void set_last_keepalive(Time last_keepalive) {
         m_last_keepalive = last_keepalive;
     }
-
+    std::string get_room_name(){return this->room_name;};
     void set_username(std::string username) { m_username = std::move(username); }
 
 private:
