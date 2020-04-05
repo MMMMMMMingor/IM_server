@@ -47,12 +47,11 @@ int main(int argc, char *argv[]) {
 
   cout << session_pool.get_current_count() << endl;
 
+  session_pool.remove_session(session_id);
+
   session_pool.for_each(
-      [session_id, &session_pool](uint64_t id, Session *session) {
+      [](uint64_t id, Session *session) {
         std::cout << id << "\n";
-        if (id == session_id) {
-          session_pool.remove_session(session_id);
-        }
       });
 
   cout << session_pool.get_current_count() << endl;

@@ -13,16 +13,6 @@
 int main() {
 
 
-    for (int i = 0; i < 12; i++) {
-        im_message::Message messag1e;
-        history_msg->add_one(messag1e);
-        std::cout << history_msg->get_id() << " ";
-
-        std::cout << history_msg->get_all().size() << std::endl;
-
-    }
-
-
     return 0;
 }
 

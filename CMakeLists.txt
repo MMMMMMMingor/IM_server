@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(IM_server)
 add_compile_options(-std=c++11)
 add_compile_options(-Wall)
-add_compile_options(-O3)
+#add_compile_options(-O3)
 
 include_directories(./include)
 include_directories(./src/message)
@@ -57,4 +57,12 @@ add_executable(test_history test/test_history.cpp src/message/message.pb.cc)
 target_link_libraries(
         test_history
         protobuf
+)
+
+add_executable(test_protobuf test/test_protobuf.cpp src/message/message.pb.cc src/loguru/loguru.cpp)
+target_link_libraries(
+        test_protobuf
+        protobuf
+        dl
+        pthread
 )
