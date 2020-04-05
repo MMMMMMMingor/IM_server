@@ -9,7 +9,26 @@ include_directories(./include)
 include_directories(./src/message)
 
 
-set(SOURCE ${SOURCE} src/loguru/loguru.cpp src/yaml/yaml.cpp src/message/message.pb.cc)
+set(SOURCE ${SOURCE}
+        src/loguru/loguru.cpp
+        src/yaml/yaml.cpp
+        src/message/message.pb.cc
+        src/server/channel.cpp
+        src/server/session.cpp
+        src/server/history_message.cpp
+        src/server/keepalive.cpp
+        src/server/reactor.cpp
+        src/server/threadpool.cpp
+        src/server/snowflake.cpp
+        src/server/common_util.cpp
+        src/server/handler/check_login_handler.cpp
+        src/server/handler/client_login_handler.cpp
+        src/server/handler/client_logout_handler.cpp
+        src/server/handler/create_connection_handler.cpp
+        src/server/handler/in_bound_handler.cpp
+        src/server/handler/keepalive_handler.cpp
+        src/server/handler/transmit_message_handler.cpp
+        )
 
 add_executable(${PROJECT_NAME} src/server/server.cpp ${SOURCE})
 
@@ -23,7 +42,11 @@ target_link_libraries(
 ############### 客户端编译 ###############
 
 set(CLIENT "IM_client")
-add_executable(${CLIENT} src/client/client.cpp ${SOURCE})
+add_executable(${CLIENT}
+        src/client/client.cpp
+        src/message/message.pb.cc
+        src/loguru/loguru.cpp
+        src/yaml/yaml.cpp)
 
 target_link_libraries(
         ${CLIENT}

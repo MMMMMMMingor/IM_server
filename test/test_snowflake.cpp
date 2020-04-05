@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include <server/snowflake.hpp>
+#include <server/snowflake.h>
 
 int main(int argc, char *argv[]) {
   IdWorker id_worker{1, 1};

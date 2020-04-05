@@ -1,10 +1,15 @@
-#ifndef CREATE_SESSION_HANDLER_HPP
-#define CREATE_SESSION_HANDLER_HPP
+#include <common.hpp>
+#include <server/handler.h>
+
 /**
- * 创建session会话
+ * 创建新的连接
  * @param Context       上下文
  */
-void create_session_handler(Context ctx) {
+void create_connection_handler(Context &ctx, im_message::Message &in_message) {
+  if (ctx.event.data.fd != ctx.listen_fd) {
+    return;
+  }
+
   struct sockaddr_in client_address {};
   socklen_t client_addrLength = sizeof(struct sockaddr_in);
   int client_fd = accept(ctx.listen_fd, (struct sockaddr *)&client_address,
@@ -16,5 +21,6 @@ void create_session_handler(Context ctx) {
 
   add_fd(ctx.epoll_fd, client_fd, true);
   LOG_F(INFO, "Add new client_fd = %d to epoll", client_fd);
+
+  ctx.channel->terminate();
 }
-#endif

@@ -1,13 +1,5 @@
-#include "common.hpp"
-#include "message.pb.h"
-#include <chrono>
-#include <iostream>
-#include <string>
-#include <thread>
-#include <yaml.hpp>
+#include <client/client_util.hpp>
 
-static std::string username;
-static std::string password;
 static uint64_t session_id{0};
 static std::string SERVER_IP;
 static uint16_t SERVER_PORT;
@@ -21,37 +13,6 @@ void client_configuration() {
 
   SERVER_IP = root["server"]["ip"].As<std::string>();
   SERVER_PORT = root["server"]["port"].As<uint16_t>();
-}
-
-/**
- * 登录
- * @param client_fd
- */
-void login(const int client_fd) {
-
-  std::cout << "用户名：";
-  std::cin >> username;
-  std::cout << "密码：";
-  std::cin >> password;
-
-  im_message::Message request;
-  request.set_type(im_message::HeadType::LOGIN_REQUEST);
-  auto *login_request = new im_message::LoginRequest;
-  login_request->set_username(username);
-  login_request->set_password(password);
-  request.set_allocated_loginrequest(login_request);
-  request.SerializeToFileDescriptor(client_fd);
-}
-
-/**
- * 心跳响应
- * @param socket_fd
- */
-void keepalive_response(uint64_t socket_fd) {
-  im_message::Message response;
-  response.set_session_id(session_id);
-  response.set_type(im_message::HeadType::KEEPALIVE_RESPONSE);
-  response.SerializeToFileDescriptor(socket_fd);
 }
 
 int main(int argc, char *argv[]) {
@@ -156,10 +117,10 @@ int main(int argc, char *argv[]) {
 
         //服务端发来消息
         if (events[i].data.fd == client_fd) {
-          //接受服务端消息
 
+          //接受服务端消息
           im_message::Message response;
-          response.ParseFromFileDescriptor(client_fd);
+          read_message(client_fd, response);
 
           switch (response.type()) {
           case im_message::HeadType::MESSAGE_RESPONSE: {
@@ -188,7 +149,7 @@ int main(int argc, char *argv[]) {
           }
           case im_message::KEEPALIVE_REQUEST: {
             printf("%s \n", "成功接收到来自服务器的心跳包");
-            keepalive_response(client_fd);
+            keepalive_response(client_fd, session_id);
             break;
           }
           case im_message::KEEPALIVE_RESPONSE:
@@ -215,7 +176,7 @@ int main(int argc, char *argv[]) {
             request.set_type(im_message::HeadType::LOGOUT_REQUEST);
             request.set_session_id(session_id);
 
-            request.SerializeToFileDescriptor(client_fd);
+            write_message(client_fd, request);
             continue;
           }
           im_message::Message request;
@@ -225,12 +186,7 @@ int main(int argc, char *argv[]) {
           message_request->set_content(message);
           request.set_allocated_messagerequest(message_request);
 
-          bool success = request.SerializeToFileDescriptor(client_fd);
-
-          // ret = 0
-          if (!success) {
-            isClientwork = false;
-          }
+          write_message(client_fd, request);
         }
       } // for
     }   // while

@@ -5,8 +5,9 @@
 #include <fcntl.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <server/util.hpp>
+#include <message.pb.h>
 #include <thread>
+#include <zconf.h>
 
 using namespace google::protobuf::io;
 using namespace std;

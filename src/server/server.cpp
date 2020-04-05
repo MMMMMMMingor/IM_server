@@ -1,7 +1,7 @@
-#include "common.hpp"
-#include "loguru.hpp"
-#include "server/reactor.hpp"
-#include <memory>
+#include <common.hpp>
+#include <loguru.hpp>
+#include <server/common_util.hpp>
+#include <server/reactor.hpp>
 #include <yaml.hpp>
 
 /**
@@ -33,8 +33,6 @@ private:
   int KEEPALIVE_INVALID_INTERVAL{};
 
   Reactor *reactor{};
-
-
 
 public:
   Server() { init(); }
