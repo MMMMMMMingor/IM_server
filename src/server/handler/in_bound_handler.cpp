@@ -10,30 +10,38 @@
  * @return 是否进行下一个handler
  */
 void in_bound_handler(Context &ctx, im_message::Message &in_message) {
-  using namespace google::protobuf::io;
+    using namespace google::protobuf::io;
 
-  int fd = ctx.event.data.fd;
+    int fd = ctx.event.data.fd;
 
-  ZeroCopyInputStream *raw_input = new FileInputStream(fd);
-  auto coded_input = new CodedInputStream(raw_input);
+    ZeroCopyInputStream *raw_input = new FileInputStream(fd);
+    auto coded_input = new CodedInputStream(raw_input);
 
-  uint32_t len;
-  coded_input->ReadVarint32(&len);
+    uint32_t len;
+    bool success1 = coded_input->ReadVarint32(&len);
 
-  char *buf = new char[len];
-  bool success = coded_input->ReadRaw(buf, len);
-  in_message.ParseFromArray(buf, len);
-  //      LOG_F(INFO, "%s", response.DebugString().c_str() );
+    if (!success1) {
+        LOG_F(ERROR, "read error fail");
+        unsigned long long session_id = ctx.session_pool.find_session_id_by_fd(ctx.epoll_fd);
+        std::cout << session_id << std::endl;
+        if(session_id != -1) ctx.session_pool.remove_session(session_id);
+        return;
+    }
 
-  // TODO 未解决半包问题
-  if (!success)
-    LOG_F(ERROR, "read message fail");
+    char *buf = new char[len];
+    bool success = coded_input->ReadRaw(buf, len);
+    in_message.ParseFromArray(buf, len);
+    //      LOG_F(INFO, "%s", response.DebugString().c_str() );
 
-  ctx.need_recv_message = false; // 读取数据完成
+    // TODO 未解决半包问题
+    if (!success)
+        LOG_F(ERROR, "read message fail");
 
-  delete[] buf;
-  delete coded_input;
-  delete raw_input;
+    ctx.need_recv_message = false; // 读取数据完成
+
+    delete[] buf;
+    delete coded_input;
+    delete raw_input;
 }
 //
 // inline bool read_until(int fd, void *ptr, size_t len) {

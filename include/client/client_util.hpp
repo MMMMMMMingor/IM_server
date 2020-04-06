@@ -11,8 +11,8 @@
 #include <string>
 #include <sys/epoll.h>
 #include <yaml.hpp>
-#include <zconf.h>
-
+//#include <zconf.h>
+#include <unistd.h>
 // message buffer size
 #define BUF_SIZE 0xFFFF
 

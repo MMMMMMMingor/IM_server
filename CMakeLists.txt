@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 project(IM_server)
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++17)
 add_compile_options(-Wall)
 #add_compile_options(-O3)
 

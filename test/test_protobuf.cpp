@@ -7,7 +7,8 @@
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <message.pb.h>
 #include <thread>
-#include <zconf.h>
+#include <unistd.h>
+//#include <zconf.h>
 
 using namespace google::protobuf::io;
 using namespace std;
