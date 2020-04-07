@@ -70,13 +70,21 @@ add_test(NAME test_yaml COMMAND test_yaml)
 SET_TESTS_PROPERTIES(test_yaml
         PROPERTIES PASS_REGULAR_EXPRESSION "9999")
 
-add_executable(test_snowflake test/test_snowflake.cpp)
+add_executable(test_snowflake test/test_snowflake.cpp src/server/snowflake.cpp)
 
-add_executable(test_session test/test_session.cpp)
+add_executable(test_session test/test_session.cpp src/server/session.cpp src/server/snowflake.cpp)
+target_link_libraries(
+        test_session
+        pthread
+)
 
 add_executable(test_keepalive test/test_keepalive.cpp)
+target_link_libraries(
+        test_keepalive
+        pthread
+)
 
-add_executable(test_history test/test_history.cpp src/message/message.pb.cc)
+add_executable(test_history test/test_history.cpp src/message/message.pb.cc src/server/history_message.cpp)
 target_link_libraries(
         test_history
         protobuf
