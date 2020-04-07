@@ -30,6 +30,18 @@ void Session::set_username(std::string username) {
     m_username = std::move(username);
 }
 
+void Session::add_msg_id() {
+    this->m_room_msg_id++; // 不会有重名的用户，加锁了
+}
+
+int Session::get_msg_id() {
+    return this->m_room_msg_id;
+}
+
+void Session::set_msg_id(int id) {
+    this->m_room_msg_id = id;
+}
+
 // ================= SessionPool =================
 
 // template <typename Lambda> void SessionPool::for_each(Lambda lambda) {
@@ -43,7 +55,7 @@ void Session::set_username(std::string username) {
 
 bool SessionPool::contains(uint64_t session_id) {
     // 同步锁
-    std::lock_guard<std::mutex> lock_guard(m_mutex);
+//    std::lock_guard<std::mutex> lock_guard(m_mutex);
     std::shared_lock<std::shared_mutex> lock(s_lock);
     auto kv = m_session_map.find(session_id);
     return kv != m_session_map.end();

@@ -26,6 +26,7 @@ void transmit_message_handler(Context &ctx, im_message::Message &in_message) {
     // 消息转发
 
     std::string username = session->get_username();
+    std::string room_name = session->get_room_name();
 
     im_message::Message out_message;
     out_message.set_type(im_message::HeadType::MESSAGE_REQUEST);
@@ -35,6 +36,7 @@ void transmit_message_handler(Context &ctx, im_message::Message &in_message) {
     message_request->set_from_nick(username);
     out_message.set_allocated_messagerequest(message_request);
 
-    board_cast_message(ctx, out_message);
+    board_cast_message_by_room_id(ctx,out_message,room_name);
+    //board_cast_message(ctx, out_message);
   }
 }

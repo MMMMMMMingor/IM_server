@@ -23,8 +23,8 @@ int HistoryMessage::get_id() { return this->id; }
 
 std::list<im_message::Message> HistoryMessage::get_all() { return msg; }
 
-// 获取 id 以后的所有消息
-void HistoryMessage::get_by_id(int id) {}
+// 获取 id 以后的所有消息, 先用  void测试
+void HistoryMessage::get_by_id(int id) {std::cout << "old_id: " << id << "cur_id: " << this->id << std::endl;}
 
 bool HistoryMessage::save(std::string msg) {
   // 保存到文件？？？

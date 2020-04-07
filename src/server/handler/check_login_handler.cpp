@@ -16,6 +16,7 @@ void check_login_handler(Context &ctx, im_message::Message &in_message) {
     notification_one(ctx, in_message.session_id(),
                      std::string{"您未登录，请先登录."});
     ctx.channel->terminate();
+
     return;
   }
 }

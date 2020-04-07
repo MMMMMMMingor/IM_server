@@ -49,11 +49,19 @@ public:
 
     void set_username(std::string username);
 
+    void add_msg_id();
+
+    void set_msg_id(int);
+
+    int get_msg_id();
+
+
 private:
     std::string m_room_name;
     int m_socket_fd{};
     Time m_last_keepalive;
     std::string m_username;
+    int m_room_msg_id{0};  // 每发送一条消息， 这里的房间号消息就加一
     std::mutex m_mutex{};
 };
 

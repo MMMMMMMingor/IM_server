@@ -23,6 +23,7 @@ struct Context {
   msgs_map &msg_map;
   Channel *channel;
   bool need_recv_message; // 是否完成数据读取
+  std::unordered_map< std::string , user_msg*> &users_info; // 保存离线的消息
 };
 
 #endif // CONTEXT_HPP

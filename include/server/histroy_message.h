@@ -38,4 +38,10 @@ private:
   std::list<im_message::Message> msg;
 };
 
+struct user_msg{
+    int m_msg_id; // 存储上一次的下线的消息id
+};
+
+
+
 #endif

@@ -29,6 +29,9 @@ private:
   SessionPool m_session_pool;
   KeepAlive *m_keep_alive;
   std::unordered_map<std::string, HistoryMessage *> msgs;
+  // 持久化每一位 用户的信息, 姓名加上房间号 才能获取到 ，
+  std::unordered_map< std::string , user_msg *> users_info; //不用指针
+
 };
 
 #endif // REACTOR_HPP

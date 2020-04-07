@@ -18,18 +18,32 @@ void in_bound_handler(Context &ctx, im_message::Message &in_message) {
     auto coded_input = new CodedInputStream(raw_input);
 
     uint32_t len;
-    bool success1 = coded_input->ReadVarint32(&len);
+    bool success1{false};
+    try {
+        success1 = coded_input->ReadVarint32(&len);
+    }catch(...) {
+        std::cout << "catch1\n";
+        if (!success1) {
+            LOG_F(ERROR, "read error fail");
+//        unsigned long long session_id = ctx.session_pool.find_session_id_by_fd(ctx.epoll_fd);
+//        std::cout << session_id << std::endl;
+//        if(session_id != -1) ctx.session_pool.remove_session(session_id);
 
-    if (!success1) {
-        LOG_F(ERROR, "read error fail");
-        unsigned long long session_id = ctx.session_pool.find_session_id_by_fd(ctx.epoll_fd);
-        std::cout << session_id << std::endl;
-        if(session_id != -1) ctx.session_pool.remove_session(session_id);
+            // 如果服务器异常关闭， 则删除直接算 logout
+
+            return;
+        }
         return;
     }
 
     char *buf = new char[len];
-    bool success = coded_input->ReadRaw(buf, len);
+    bool success;
+    try {
+       success = coded_input->ReadRaw(buf, len);
+    }catch(...){
+        std::cout << "catch2\n";
+        return;
+    }
     in_message.ParseFromArray(buf, len);
     //      LOG_F(INFO, "%s", response.DebugString().c_str() );
 
