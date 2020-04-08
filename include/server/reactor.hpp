@@ -3,6 +3,7 @@
 
 #include <server/keepalive.h>
 #include <server/threadpool.h>
+#include "channelpool.h"
 
 class Reactor {
 
@@ -31,6 +32,8 @@ private:
   std::unordered_map<std::string, HistoryMessage *> msgs;
   // 持久化每一位 用户的信息, 姓名加上房间号 才能获取到 ，
   std::unordered_map< std::string , user_msg *> users_info; //不用指针
+
+  ChannelPool m_channel_pool;
 
 };
 

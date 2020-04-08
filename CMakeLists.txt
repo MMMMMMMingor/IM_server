@@ -28,7 +28,7 @@ set(SOURCE ${SOURCE}
         src/server/handler/in_bound_handler.cpp
         src/server/handler/keepalive_handler.cpp
         src/server/handler/transmit_message_handler.cpp
-        )
+        src/server/channelpool.cpp)
 
 add_executable(${PROJECT_NAME} src/server/server.cpp ${SOURCE})
 

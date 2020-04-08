@@ -46,7 +46,6 @@ void in_bound_handler(Context &ctx, im_message::Message &in_message) {
         return;
     }
 
-
     char *buf = new char[len];
     bool success;
     try {
