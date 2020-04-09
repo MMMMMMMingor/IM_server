@@ -34,6 +34,7 @@ set(SOURCE ${SOURCE}
         src/server/websocket_handler.cpp
         src/server/websocket_protocol.cpp
         src/server/server.cpp
+        src/server/handler/websocket_handler.cpp
         )
 
 add_executable(${PROJECT_NAME} src/server/main.cpp ${SOURCE})

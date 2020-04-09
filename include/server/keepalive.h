@@ -18,10 +18,10 @@ public:
 
   ~KeepAlive() { m_finished = true; }
 
-  void init(SessionPool *session_pool);
+  void init();
 
 private:
-  void keepalive_check(SessionPool *session_pool);
+  void keepalive_check();
 
 private:
   std::chrono::minutes m_check_interval;   // 心跳检测间隔

@@ -9,14 +9,16 @@ void transmit_message_handler(Context &ctx, im_message::Message &in_message) {
   if (im_message::HeadType::MESSAGE_REQUEST != in_message.type())
     return;
 
+  SessionPool *session_pool = SessionPool::get_instance();
+
   int client_fd = ctx.event.data.fd;
   uint64_t session_id = in_message.session_id();
-  Session *session = ctx.session_pool.find_session(session_id);
+  Session *session = session_pool->find_session(session_id);
 
   LOG_F(INFO, "read from client(clientID = %d)", client_fd);
 
   // 当前只有一个用户在线
-  if (1 == ctx.session_pool.get_current_count()) {
+  if (1 == session_pool->get_current_count()) {
     std::string notice("聊天室仅有您一个人。。。");
     //通知
     notification_one(ctx, session_id, notice);

@@ -5,6 +5,15 @@
 #include <loguru.hpp>
 #include <server/channelpool.h>
 
+ChannelPool *ChannelPool::m_instance = nullptr;
+
+ChannelPool *ChannelPool::get_instance() {
+  if (m_instance == nullptr) {
+    m_instance = new ChannelPool;
+  }
+  return ChannelPool::m_instance;
+}
+
 /**
  * 通过fd 给分配一个channel，
  *

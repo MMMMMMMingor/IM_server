@@ -24,10 +24,10 @@ enum WS_FrameType {
 
 WS_Status get_response_http(string &request, string &response);
 
-WS_FrameType ws_decode_frame(string inFrame,
+WS_FrameType ws_decode_frame(const string &inFrame,
                              string &outMessage); //解码帧
 
-WS_FrameType ws_encode_frame(string inMessage, string &outFrame,
+WS_FrameType ws_encode_frame(const string &inMessage, string &outFrame,
                              enum WS_FrameType frameType); //编码帧打包
 } // namespace WebSocket_Protocol
 

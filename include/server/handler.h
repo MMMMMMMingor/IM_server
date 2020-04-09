@@ -13,5 +13,6 @@ void create_connection_handler(Context &ctx, im_message::Message &in_message);
 void in_bound_handler(Context &ctx, im_message::Message &in_message);
 void keepalive_handler(Context &ctx, im_message::Message &in_message);
 void transmit_message_handler(Context &ctx, im_message::Message &in_message);
+void websocket_handler(Context &ctx, im_message::Message &in_message);
 
 #endif

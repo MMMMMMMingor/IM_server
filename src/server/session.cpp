@@ -44,14 +44,14 @@ void Session::set_msg_id(int id) {
 
 // ================= SessionPool =================
 
-// template <typename Lambda> void SessionPool::for_each(Lambda lambda) {
-//  std::lock_guard<std::mutex> lock_guard(m_mutex);
-//
-//  std::for_each(m_session_map.begin(), m_session_map.end(),
-//                [lambda](std::pair<uint64_t, Session *> kv) {
-//                  lambda(kv.first, kv.second);
-//                });
-//}
+SessionPool *SessionPool::m_instance = nullptr;
+
+SessionPool *SessionPool::get_instance() {
+  if (m_instance == nullptr) {
+    m_instance = new SessionPool;
+  }
+  return m_instance;
+}
 
 bool SessionPool::contains(uint64_t session_id) {
     // 同步锁

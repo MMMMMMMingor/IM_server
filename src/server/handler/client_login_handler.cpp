@@ -39,13 +39,13 @@ void client_login_handler(Context &ctx, im_message::Message &in_message) {
     //增添 room_name
     session->set_room_name(pwd);
 
-    uint64_t session_id = ctx.session_pool.add_session(session);
+    uint64_t session_id = SessionPool::get_instance()->add_session(session);
 
     LOG_F(INFO, "用户登录：%s : %s", username.c_str(),
           login_request.password().c_str());
 
     LOG_F(INFO, "Now there are %d clients int the IM_server room",
-          ctx.session_pool.get_current_count());
+          SessionPool::get_instance()->get_current_count());
 
     // 服务端发送欢迎信息
     std::string welcome = "欢迎来到文明——聊天室! 您的 session ID : ";

@@ -66,7 +66,7 @@ WS_Status get_response_http(string &request, string &response) {
   return ret;
 }
 
-WS_FrameType ws_decode_frame(string inFrame, string &outMessage) {
+WS_FrameType ws_decode_frame(const string &inFrame, string &outMessage) {
   int ret = WS_OPENING_FRAME;
   const char *frameData = inFrame.c_str();
   const int frameLength = inFrame.size();
@@ -134,7 +134,7 @@ WS_FrameType ws_decode_frame(string inFrame, string &outMessage) {
   return static_cast<WS_FrameType>(ret);
 }
 
-WS_FrameType ws_encode_frame(string inMessage, string &outFrame,
+WS_FrameType ws_encode_frame(const string &inMessage, string &outFrame,
                              enum WS_FrameType frameType) {
   int ret = WS_EMPTY_FRAME;
   const uint32_t messageLength = inMessage.size();

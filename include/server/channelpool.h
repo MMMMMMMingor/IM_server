@@ -15,12 +15,15 @@
 
 class ChannelPool {
 public:
-    Channel *get_channel_by_fd(int,int);
+  static ChannelPool *get_instance();
 
-    void add_channel_by_fd(int,Channel*);
+  Channel *get_channel_by_fd(int, int);
+
+  void add_channel_by_fd(int, Channel *);
 
 private:
-    std::unordered_map<int, Channel*> m_channel_pool;
+  static ChannelPool *m_instance;
+  std::unordered_map<int, Channel *> m_channel_pool;
 };
 
 #endif // CHANNEL_POOL_H

@@ -1,7 +1,7 @@
 #include "server/websocket_handler.h"
+#include "loguru.hpp"
 #include "server/websocket_protocol.h"
 #include <cstring>
-#include <iostream>
 #include <string>
 #include <unistd.h>
 
@@ -16,7 +16,7 @@ int Websocket_Handler::process() {
 
   std::string out_string;
   WebSocket_Protocol::ws_decode_frame(std::string(buff_), out_string);
-  std::cout << out_string << std::endl;
+  LOG_F(INFO, "payload %s", out_string.c_str());
 
   memset(buff_, 0, sizeof(buff_));
 

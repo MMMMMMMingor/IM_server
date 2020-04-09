@@ -25,10 +25,10 @@ void in_bound_handler(Context &ctx, im_message::Message &in_message) {
     LOG_F(ERROR, "read error fail");
     //不让后面的session进行了
     ctx.channel->terminate();
-    if (unsigned long long i =
-            ctx.session_pool.find_session_id_by_fd(fd) != -1) {
+    if (uint64_t i =
+            SessionPool::get_instance()->find_session_id_by_fd(fd) != -1) {
       std::cout << "logined\n";
-      ctx.session_pool.remove_session(i);
+      SessionPool::get_instance()->remove_session(i);
     }
     // 如果服务器异常关闭， 则删除直接算 logout
     return;

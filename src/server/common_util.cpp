@@ -93,9 +93,10 @@ void send_message_safe(Session *session,
  */
 void send_message(Context &ctx, const im_message::Message &out_message) {
     LOG_F(INFO, "--------------send_message-------------------");
-    Session *session = ctx.session_pool.find_session(out_message.session_id());
+  Session *session =
+      SessionPool::get_instance()->find_session(out_message.session_id());
 
-    send_message_safe(session, out_message);
+  send_message_safe(session, out_message);
 }
 
 /**
@@ -110,7 +111,7 @@ void board_cast_message(Context &ctx, const im_message::Message &message) {
         send_message_safe(session, message);
     };
 
-    ctx.session_pool.for_each(lambda);
+    SessionPool::get_instance()->for_each(lambda);
 }
 
 void board_cast_message_by_room_id(Context &ctx,
@@ -128,7 +129,7 @@ void board_cast_message_by_room_id(Context &ctx,
         send_message_safe(session, message);
     };
 
-    ctx.session_pool.for_each(lambda);
+    SessionPool::get_instance()->for_each(lambda);
 }
 
 /**
