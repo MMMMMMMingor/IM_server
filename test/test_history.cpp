@@ -5,10 +5,8 @@
 #ifndef IM_SERVER_TEST_HISTORY_CPP_H
 #define IM_SERVER_TEST_HISTORY_CPP_H
 
-
+#include <common.h>
 #include <message.pb.h>
-#include <common.hpp>
-
 
 int main() {
 

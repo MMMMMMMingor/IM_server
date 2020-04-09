@@ -1,7 +1,7 @@
 //
 // Created by Mingor on 2020/4/5.
 //
-#include <common.hpp>
+#include <common.h>
 #include <server/common_util.hpp>
 
 /**
@@ -60,20 +60,30 @@ void send_message_safe(Session *session,
     std::lock_guard<std::mutex> lg(session->get_mutex());
     int fd = session->get_socket_fd();
 
-    ZeroCopyOutputStream *raw_output = new FileOutputStream(fd);
-
-    auto coded_output = new CodedOutputStream(raw_output);
-
     uint32_t len = out_message.ByteSizeLong();
+
+    LOG_F(INFO, "write len %zu", write(fd, &len, sizeof(uint32_t)));
+
     char *buf = new char[len];
     out_message.SerializeToArray(buf, len);
-
-    coded_output->WriteVarint32(len);
-    coded_output->WriteRaw(buf, len);
+    LOG_F(INFO, "write len %zu", write(fd, buf, len));
 
     delete[] buf;
-    delete coded_output;
-    delete raw_output;
+
+    //    ZeroCopyOutputStream *raw_output = new FileOutputStream(fd);
+    //
+    //    auto coded_output = new CodedOutputStream(raw_output);
+    //
+    //    uint32_t len = out_message.ByteSizeLong();
+    //    char *buf = new char[len];
+    //    out_message.SerializeToArray(buf, len);
+    //
+    //    coded_output->WriteVarint32(len);
+    //    coded_output->WriteRaw(buf, len);
+    //
+    //    delete[] buf;
+    //    delete coded_output;
+    //    delete raw_output;
 }
 
 /**

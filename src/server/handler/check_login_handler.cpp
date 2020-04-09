@@ -1,3 +1,4 @@
+#include "server/channel.h"
 #include <server/handler.h>
 
 /**

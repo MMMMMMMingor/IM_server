@@ -7,13 +7,13 @@
 
 #include "histroy_message.h"
 #include "session.h"
-#include "channelpool.h"
 #include <sys/epoll.h>
 #include <unordered_map>
 
 using msgs_map = std::unordered_map<std::string, HistoryMessage *>;
 
 class Channel;
+class ChannelPool;
 
 // 上下文
 struct Context {

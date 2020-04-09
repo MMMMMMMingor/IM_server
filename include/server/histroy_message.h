@@ -7,6 +7,7 @@
 #ifndef HISTORY_MESSAGE_H
 #define HISTORY_MESSAGE_H
 
+#include "message.pb.h"
 #include <list>
 
 // 存储全局的消息， 最多存储 n 条

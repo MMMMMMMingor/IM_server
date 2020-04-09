@@ -38,7 +38,7 @@ message MessageRequest {
     uint64 msg_id = 1; //消息id
     uint64 from = 2; //发送方sessionId
     uint64 to = 3; //接收方sessionId
-    uint64 time = 4; //时间戳(单位:毫秒)
+    string time = 4; //时间戳
     uint32 msg_type = 5; //消息类型  1：纯文本  2：音频 3：视频 4：地理位置 5：其他
     string content = 6; //消息内容
     string url = 7; //多媒体地址

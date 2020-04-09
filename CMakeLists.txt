@@ -28,9 +28,15 @@ set(SOURCE ${SOURCE}
         src/server/handler/in_bound_handler.cpp
         src/server/handler/keepalive_handler.cpp
         src/server/handler/transmit_message_handler.cpp
-        src/server/channelpool.cpp)
+        src/server/channelpool.cpp
+        src/server/base64.cpp
+        src/server/sha1.cpp
+        src/server/websocket_handler.cpp
+        src/server/websocket_protocol.cpp
+        src/server/server.cpp
+        )
 
-add_executable(${PROJECT_NAME} src/server/server.cpp ${SOURCE})
+add_executable(${PROJECT_NAME} src/server/main.cpp ${SOURCE})
 
 target_link_libraries(
         ${PROJECT_NAME}
