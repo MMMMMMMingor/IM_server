@@ -7,12 +7,12 @@
 #include <server/reactor.hpp>
 
 Reactor::Reactor(int min, int max, int size, int check, int invalid)
-    : m_thread_pool(new ThreadPool(min, max, size)), m_session_pool{},
-      m_keep_alive{new KeepAlive{check, invalid}} {}
+        : m_thread_pool(new ThreadPool(min, max, size)), m_session_pool{},
+          m_keep_alive{new KeepAlive{check, invalid}} {}
 
 Reactor::~Reactor() {
-  delete m_thread_pool;
-  delete m_keep_alive;
+    delete m_thread_pool;
+    delete m_keep_alive;
 }
 
 /**
@@ -28,15 +28,14 @@ void Reactor::init() { m_keep_alive->init(&m_session_pool); }
  */
 
 bool Reactor::dispatch(struct epoll_event event, int listen_fd, int epoll_fd) {
-  Context ctx{event, listen_fd, epoll_fd, m_session_pool, msgs, nullptr, true, users_info};
-  return m_thread_pool->add_task(
-      [](Context ctx) {
-        check_event_type(ctx.event.events);
-
-        Channel channel;
-        ctx.channel = &channel;
-
-        channel.pipeline(ctx);
-      },
-      ctx);
+    Context ctx{event, listen_fd, epoll_fd, m_session_pool, msgs,
+                nullptr, true, users_info, m_channel_pool};
+    return m_thread_pool->add_task(
+            [](Context ctx) {
+                check_event_type(ctx.event.events);
+                Channel *channel = ctx.channel_pool.get_channel_by_fd(ctx.event.data.fd);
+                ctx.channel = channel;
+                channel->pipeline(ctx);
+            },
+            ctx);
 }
