@@ -31,7 +31,6 @@ set(SOURCE ${SOURCE}
         src/server/channelpool.cpp
         src/server/base64.cpp
         src/server/sha1.cpp
-        src/server/websocket_handler.cpp
         src/server/websocket_protocol.cpp
         src/server/server.cpp
         src/server/handler/websocket_handler.cpp

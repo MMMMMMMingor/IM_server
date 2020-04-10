@@ -14,10 +14,27 @@
 #include <message.pb.h>
 #include <server/context.hpp>
 
+/**
+ * 获取当前时间戳
+ * @return
+ */
 std::string getTime();
 
+/**
+ *设置非阻塞
+ */
 int setNonblock(int sockfd);
 
+/**
+ * 将文件描述符 fd 添加到 epollfd 标示的内核事件表中,
+ * 并注册 EPOLLIN 和 EPOOLET 事件,
+ * EPOLLIN 是数据可读事件；EPOOLET 表明是 ET 工作方式。
+ * 最后将文件描述符设置非阻塞方式
+ * @param epoll_fd :epoll 文件描述符
+ * @param fd      :文件描述符
+ * @param enable_et:enable_et = true,
+ * 是否采用epoll的ET(边缘触发)工作方式；否则采用LT(水平触发)工作方式
+ */
 void add_fd(int epollfd, int fd, bool enable_et);
 
 /**

@@ -76,10 +76,6 @@ public:
   static SessionPool *get_instance();
 
 public:
-  SessionPool() = default;
-
-  ~SessionPool() = default;
-
   template <typename Lambda> void for_each(Lambda lambda) {
     std::lock_guard<std::mutex> lock_guard(m_mutex);
 
@@ -104,6 +100,10 @@ public:
   unsigned long long find_session_id_by_fd(int fd);
 
 private:
+  SessionPool() = default;
+
+  ~SessionPool() = default;
+
   static SessionPool *m_instance;
   IdWorker m_id_worker{1, 1};
   std::mutex m_mutex{};

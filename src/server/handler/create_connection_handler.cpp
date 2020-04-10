@@ -16,8 +16,9 @@ void create_connection_handler(Context &ctx, im_message::Message &in_message) {
     socklen_t client_addrLength = sizeof(struct sockaddr_in);
     int client_fd = accept(ctx.listen_fd, (struct sockaddr *) &client_address,
                            &client_addrLength);
-    ChannelPool::get_instance()->add_channel_by_fd(client_fd,
-                                                   ctx.channel); // 耦合太高了
+
+    ChannelPool::get_instance()->add_channel_by_fd(client_fd); // TODO
+                                                               // 耦合太高了
 
     LOG_F(INFO, "用户连接: %s : % d(IP : port), client_fd = %d ",
           inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port),

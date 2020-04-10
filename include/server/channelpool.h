@@ -12,16 +12,18 @@
  * 2、 在 chanel 中存储每一个fd 的buf，用于
  * 处理半包问题和粘包问题 3、 。。
  */
-
+// TODO 是不是要考虑加锁？
 class ChannelPool {
 public:
   static ChannelPool *get_instance();
 
   Channel *get_channel_by_fd(int, int);
 
-  void add_channel_by_fd(int, Channel *);
+  void add_channel_by_fd(int);
 
 private:
+  ChannelPool() = default;
+  ~ChannelPool() = default;
   static ChannelPool *m_instance;
   std::unordered_map<int, Channel *> m_channel_pool;
 };

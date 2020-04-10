@@ -1,3 +1,4 @@
+#include "server/channelpool.h"
 #include <server/handler.h>
 
 /**
@@ -6,8 +7,12 @@
  * @param in_message
  */
 void keepalive_handler(Context &ctx, im_message::Message &in_message) {
-  if (im_message::HeadType::KEEPALIVE_RESPONSE != in_message.type())
+  //  if (im_message::HeadType::KEEPALIVE_RESPONSE != in_message.type())
+  //    return;
+  Channel *channel = ctx.channel;
+  if (channel->frame_type_ != WebSocket_Protocol::WS_FrameType::WS_PONG_FRAME) {
     return;
+  }
 
   uint64_t session_id = in_message.session_id();
   auto session = SessionPool::get_instance()->find_session(session_id);

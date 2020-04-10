@@ -1,4 +1,5 @@
 #include "server/websocket_protocol.h"
+#include "loguru.hpp"
 #include "server/base64.h"
 #include "server/sha1.h"
 #include <arpa/inet.h>
@@ -66,7 +67,7 @@ WS_Status get_response_http(string &request, string &response) {
   return ret;
 }
 
-WS_FrameType ws_decode_frame(const string &inFrame, string &outMessage) {
+WS_FrameType ws_decode_frame(string inFrame, string &outMessage) {
   int ret = WS_OPENING_FRAME;
   const char *frameData = inFrame.c_str();
   const int frameLength = inFrame.size();
@@ -106,10 +107,16 @@ WS_FrameType ws_decode_frame(const string &inFrame, string &outMessage) {
       // 数据过长,暂不支持
       ret = WS_ERROR_FRAME;
     }
-  } else if (opcode == WS_BINARY_FRAME || opcode == WS_PING_FRAME ||
-             opcode == WS_PONG_FRAME) {
-    // 二进制/ping/pong帧暂不处理
+  } else if (opcode == WS_BINARY_FRAME) {
+    ret = WS_BINARY_FRAME;
+  } else if (opcode == WS_PING_FRAME) {
+    LOG_F(INFO, "receive WS_PING_FRAME");
+    ret = WS_PING_FRAME;
+  } else if (opcode == WS_PONG_FRAME) {
+    LOG_F(INFO, "receive WS_PONG_FRAME");
+    ret = WS_PONG_FRAME;
   } else if (opcode == WS_CLOSING_FRAME) {
+    LOG_F(INFO, "receive WS_CLOSING_FRAME");
     ret = WS_CLOSING_FRAME;
   } else {
     ret = WS_ERROR_FRAME;
@@ -134,7 +141,7 @@ WS_FrameType ws_decode_frame(const string &inFrame, string &outMessage) {
   return static_cast<WS_FrameType>(ret);
 }
 
-WS_FrameType ws_encode_frame(const string &inMessage, string &outFrame,
+WS_FrameType ws_encode_frame(string inMessage, string &outFrame,
                              enum WS_FrameType frameType) {
   int ret = WS_EMPTY_FRAME;
   const uint32_t messageLength = inMessage.size();
@@ -175,4 +182,5 @@ WS_FrameType ws_encode_frame(const string &inMessage, string &outFrame,
   delete[] frameHeader;
   return static_cast<WS_FrameType>(ret);
 }
+
 } // namespace WebSocket_Protocol

@@ -27,7 +27,7 @@ void Reactor::init() { m_keep_alive->init(); }
  * @param epoll_fd      epoll socket 文件描述符
  */
 bool Reactor::dispatch(struct epoll_event event, int listen_fd, int epoll_fd) {
-  Context ctx{event, listen_fd, epoll_fd, msgs, nullptr, true, users_info};
+  Context ctx{event, listen_fd, epoll_fd, msgs, nullptr, users_info};
   return m_thread_pool->add_task(
       [](Context ctx) {
         check_event_type(ctx.event.events);
