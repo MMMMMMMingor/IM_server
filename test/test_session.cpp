@@ -22,13 +22,13 @@ inline void print(Session *session) {
 
 int main(int argc, char *argv[]) {
 
-  SessionPool session_pool;
+  SessionPool *session_pool = SessionPool::get_instance();
 
   Session *session = new Session{5, chrono::system_clock::now(), "mingor"};
-  uint64_t session_id = session_pool.add_session(session);
-  session_pool.add_session(session);
-  session_pool.add_session(session);
-  session_pool.add_session(session);
+  uint64_t session_id = session_pool->add_session(session);
+  session_pool->add_session(session);
+  session_pool->add_session(session);
+  session_pool->add_session(session);
   //
   //  Session *session2 = session_pool.find_session(session_id);
   //  print(session2);
@@ -45,16 +45,16 @@ int main(int argc, char *argv[]) {
   //  if (Session *session5 = session_pool.find_session(session_id))
   //    print(session5);
 
-  cout << session_pool.get_current_count() << endl;
+  cout << session_pool->get_current_count() << endl;
 
-  session_pool.remove_session(session_id);
+  session_pool->remove_session(session_id);
 
-  session_pool.for_each(
+  session_pool->for_each(
       [](uint64_t id, Session *session) {
         std::cout << id << "\n";
       });
 
-  cout << session_pool.get_current_count() << endl;
+  cout << session_pool->get_current_count() << endl;
 
   //  cout << session_pool.contains(session_id) << endl;
   //

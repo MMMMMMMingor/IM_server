@@ -97,7 +97,7 @@ public:
 
   Session *find_session(uint64_t session_id);
 
-  unsigned long long find_session_id_by_fd(int fd);
+  uint64_t find_session_id_by_fd(int fd);
 
 private:
   SessionPool() = default;

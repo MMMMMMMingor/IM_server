@@ -15,6 +15,9 @@
 // TODO 是不是要考虑加锁？
 class ChannelPool {
 public:
+  ~ChannelPool() = default;
+
+public:
   static ChannelPool *get_instance();
 
   Channel *get_channel_by_fd(int, int);
@@ -23,7 +26,6 @@ public:
 
 private:
   ChannelPool() = default;
-  ~ChannelPool() = default;
   static ChannelPool *m_instance;
   std::unordered_map<int, Channel *> m_channel_pool;
 };

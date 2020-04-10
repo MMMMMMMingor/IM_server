@@ -106,8 +106,8 @@ Session *SessionPool::find_session(uint64_t session_id) {
     }
 }
 
-unsigned long long SessionPool::find_session_id_by_fd(int fd) {
-    // 同步锁
+uint64_t SessionPool::find_session_id_by_fd(int fd) {
+  // 同步锁
     //std::lock_guard<std::mutex> lock_guard(m_mutex);
     std::shared_lock<std::shared_mutex> lock(s_lock);
     for (auto &s : m_session_map)
